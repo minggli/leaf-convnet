@@ -13,7 +13,7 @@ dir_path = 'leaf/images/'
 model_path = 'models/'
 pid_label, pid_name, mapping = extract('leaf/train.csv')
 pic_names = [i.name for i in os.scandir(dir_path) if i.is_file() and i.name.endswith('.jpg')]
-input_shape = (96, 96)
+input_shape = (384, 384)
 m = input_shape[0] * input_shape[1]  # num of flat array
 n = len(set(pid_name.values()))
 
@@ -49,7 +49,7 @@ def conv2d(x, W):
 
 
 def max_pool_2x2(x):
-    return tf.nn.max_pool(x, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
+    return tf.nn.max_pool(x, ksize=[1, 4, 4, 1], strides=[1, 4, 4, 1], padding='SAME')
 
 
 # First Convolution Layer
@@ -77,10 +77,10 @@ h_conv3 = tf.nn.relu(conv2d(h_pool2, W_conv3) + b_conv3)
 h_pool3 = max_pool_2x2(h_conv3)
 
 # Densely connected layer
-W_fc1 = weight_variable([12 * 12 * 128, 1024])
+W_fc1 = weight_variable([6 * 6 * 128, 1024])
 b_fc1 = bias_variable([1024])
 
-h_pool3_flat = tf.reshape(h_pool3, [-1, 12 * 12 * 128])
+h_pool3_flat = tf.reshape(h_pool3, [-1, 6 * 6 * 128])
 h_fc1 = tf.nn.relu(tf.matmul(h_pool3_flat, W_fc1) + b_fc1)
 
 # Dropout
