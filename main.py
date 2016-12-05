@@ -150,13 +150,13 @@ def main(loop_num=0):
 
 # cross validation of training photos
 
-cross_val = True
+cross_val = False
 delete = True
 
 if delete:
     delete_folders()
 
-kf_iterator = model_selection.StratifiedKFold(n_splits=5, shuffle=True)  # Stratified
+kf_iterator = model_selection.StratifiedKFold(n_splits=10, shuffle=True)  # Stratified
 train_x = list(pid_name.keys())  # leaf id
 train_y = list(pid_name.values())  # leaf species names
 count = 0
@@ -193,7 +193,7 @@ for train_index, valid_index in kf_iterator.split(train_x, train_y):
 
     # create batches
     train = np.array(train)
-    batches = batch_iter(data=train, batch_size=200, num_epochs=15)
+    batches = batch_iter(data=train, batch_size=200, num_epochs=500)
 
     valid = np.array(valid)
     valid_x = np.array([i[0] for i in valid])
