@@ -60,7 +60,6 @@ def move_classified(test_order, ans, mapping, dir_path='leaf/images/'):
         quest = list(ans[k]).index(max(list(ans[k])))
         name = mapping[quest]
         answers[i] = name
-        print(i, name)
 
     for filename in answers.keys():
         pid = int(filename.split('.')[0])
