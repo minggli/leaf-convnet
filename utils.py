@@ -67,3 +67,4 @@ def move_classified(test_order, ans, mapping, dir_path='leaf/images/'):
         if not os.path.exists(directory):
             os.makedirs(directory)
         os.rename(dir_path + 'test/' + filename, directory + '/' + filename)
+
