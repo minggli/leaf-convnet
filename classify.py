@@ -145,7 +145,7 @@ total = np.array(total)
 
 # ans = sess.run(y_conv, feed_dict={x: test, keep_prob: 1})
 ans = sess.run(tf.nn.softmax(y_conv), feed_dict={x: test, keep_prob: 1})
-print(ans[0][2])
+
 move_classified(test_order, ans, mapping)
 
 data = pd.DataFrame(data=ans, columns=mapping.values(), dtype=np.float32, index=[int(i.split('.')[0]) for i in test_order])
