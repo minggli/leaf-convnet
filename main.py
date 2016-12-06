@@ -150,7 +150,7 @@ def main(loop_num=0):
 
 # cross validation of training photos
 
-cross_val = False
+cross_val = True
 delete = True
 
 if delete:
@@ -193,7 +193,7 @@ for train_index, valid_index in kf_iterator.split(train_x, train_y):
 
     # create batches
     train = np.random.permutation(np.array(train))
-    batches = batch_iter(data=train, batch_size=300, num_epochs=2000, shuffle=True)
+    batches = batch_iter(data=train, batch_size=300, num_epochs=20, shuffle=True)
 
     valid = np.array(valid)
     valid_x = np.array([i[0] for i in valid])
