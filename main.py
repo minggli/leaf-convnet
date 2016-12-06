@@ -156,7 +156,7 @@ delete = True
 if delete:
     delete_folders()
 
-kf_iterator = model_selection.StratifiedKFold(n_splits=3, shuffle=True)  # Stratified
+kf_iterator = model_selection.StratifiedKFold(n_splits=5, shuffle=True)  # Stratified
 train_x = list(pid_name.keys())  # leaf id
 train_y = list(pid_name.values())  # leaf species names
 count = 0
