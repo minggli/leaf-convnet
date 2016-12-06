@@ -192,7 +192,7 @@ for train_index, valid_index in kf_iterator.split(train_x, train_y):
         leaf_images[pid].save(directory + '/' + filename)
 
     # create batches
-    train = np.array(train)
+    train = np.random.permutation(np.array(train))
     batches = batch_iter(data=train, batch_size=200, num_epochs=2000, shuffle=False)
 
     valid = np.array(valid)
