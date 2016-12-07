@@ -131,6 +131,14 @@ def main(loop_num=0):
     save_path = saver.save(sess, model_path + "model_loop_{0}.ckpt".format(loop_num))
     print("Model saved in file: {0}".format(save_path))
 
+
+leaf_images = dict()  # temp dictionary of re-sized leaf images
+
+for filename in pic_names:
+    pid = int(filename.split('.')[0])
+    leaf_images[pid] = pic_resize(dir_path + filename, size=input_shape, pad=True)
+
+
 # cross validation of training photos
 
 cross_val = True
@@ -140,13 +148,13 @@ if delete:
     delete_folders()
 
 kf_iterator = model_selection.StratifiedKFold(n_splits=5, shuffle=True)  # Stratified
+
 train_x = list(pid_name.keys())  # leaf id
 train_y = list(pid_name.values())  # leaf species names
 count = 0
 
 for train_index, valid_index in kf_iterator.split(train_x, train_y):
 
-    leaf_images = dict()  # temp dictionary of re-sized leaf images
     train = list()  # array of image and label in 1D array
     valid = list()  # array of image and label in 1D array
 
@@ -156,7 +164,6 @@ for train_index, valid_index in kf_iterator.split(train_x, train_y):
     for filename in pic_names:
 
         pid = int(filename.split('.')[0])
-        leaf_images[pid] = pic_resize(dir_path + filename, size=input_shape, pad=True)
 
         if pid in train_id:
             directory = dir_path + 'train/' + pid_name[pid]
@@ -187,4 +194,3 @@ for train_index, valid_index in kf_iterator.split(train_x, train_y):
 
     if not cross_val:
         break
-
