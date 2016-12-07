@@ -85,7 +85,7 @@ h_pool3 = max_pool_2x2(h_conv3)
 W_fc1 = weight_variable([6 * 6 * 64, 1024])
 b_fc1 = bias_variable([1024])
 
-h_pool3_flat = tf.reshape(h_pool3, [-1, 6 * 6 * 128])
+h_pool3_flat = tf.reshape(h_pool3, [-1, 6 * 6 * 64])
 h_fc1 = tf.nn.relu(tf.matmul(h_pool3_flat, W_fc1) + b_fc1)
 
 # Dropout
@@ -140,7 +140,7 @@ for filename in pic_names:
 
 # cross validation of training photos
 
-cross_val = True
+cross_val = False
 delete = True
 
 if delete:
