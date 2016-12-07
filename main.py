@@ -128,6 +128,8 @@ def main(loop_num=0):
         recent_100.append(train_accuracy)
         if len(recent_100) > 100:
             recent_100.pop(0)
+        if min(recent_100) == 1:
+            break
         train_step.run(feed_dict={x: x_batch, y_: y_batch, keep_prob: 0.5}, session=sess)
 
     if not os.path.exists(model_path):
