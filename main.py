@@ -138,7 +138,6 @@ for filename in pic_names:
     pid = int(filename.split('.')[0])
     leaf_images[pid] = pic_resize(dir_path + filename, size=input_shape, pad=True)
 
-
 # cross validation of training photos
 
 cross_val = True
