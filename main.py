@@ -113,7 +113,6 @@ saver = tf.train.Saver()
 def main(loop_num=0):
 
     print('\n\n\n\n starting cross validation... \n\n\n\n')
-    recent_100 = list()
 
     for batch in batches:
         e = batch[0]
@@ -147,6 +146,7 @@ kf_iterator = model_selection.StratifiedKFold(n_splits=5, shuffle=True)  # Strat
 train_x = list(pid_name.keys())  # leaf id
 train_y = list(pid_name.values())  # leaf species names
 count = 0
+recent_100 = list()
 
 for train_index, valid_index in kf_iterator.split(train_x, train_y):
 
