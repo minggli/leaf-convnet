@@ -10,9 +10,10 @@ def extract(train_data):
     mapping = {k: v for k, v in enumerate(pd.get_dummies(train['species']).columns)}
     dummies = pd.get_dummies(train['species'])
     dummies.columns = mapping.keys()
-    pid_label = dict(zip(dummies.index, np.array(dummies)))
+    pid_label = dict(zip(train.index, np.array(dummies)))
     id_name = dict(zip(train.index, train['species']))
-    return pid_label, id_name, mapping
+    data = train.ix[:, ~train.columns.isin(['species'])]
+    return pid_label, id_name, mapping, data
 
 
 def delete_folders(dirs=['test', 'train', 'validation'], dir_path='leaf/images/'):
