@@ -18,7 +18,7 @@ def extract(train_data):
     return pid_label, id_name, mapping, data
 
 
-def delete_folders(dirs=['test', 'train', 'validation'], dir_path='leaf/images/'):
+def delete_folders(dirs=['test', 'train', 'validation','result'], dir_path='leaf/images/'):
 
     for directory in dirs:
         if os.path.exists(dir_path + directory):
@@ -82,8 +82,8 @@ def move_classified(test_order, pid_name, ans, mapping, dir_path='leaf/images/')
             shutil.copyfile(str(dir_path + str(pid) + r'.jpg'), str(directory + '/' + str(pid) + r'.jpg'))
 
 
-def generate_training_set(data, pid_label, std=True):
-    """ raw data transformation (Standardisation)"""
+def generate_training_set(data, pid_label, pixels=None, std=True):
+    """ raw data transformation (standardisation)"""
     if std:
         data = data.apply(preprocessing.scale, with_mean=False, with_std=True, axis=0)
     margins = data.ix[:, data.columns.str.startswith('margin')]
@@ -91,10 +91,20 @@ def generate_training_set(data, pid_label, std=True):
     textures = data.ix[:, data.columns.str.startswith('texture')]
 
     input_data = dict()
+
     if pid_label:
-        for i in data.index:
-            input_data[i] = (np.concatenate((margins.ix[i, :], shapes.ix[i, :], textures.ix[i, :]), axis=0).reshape(3, 64), pid_label[i])
+        if pixels:
+            for i in data.index:
+                input_data[i] = (np.concatenate((margins.ix[i, :], shapes.ix[i, :], textures.ix[i, :], np.array(pixels[i]).flatten()), axis=0).reshape(4, 64), pid_label[i])
+        else:
+            for i in data.index:
+                input_data[i] = (np.concatenate((margins.ix[i, :], shapes.ix[i, :], textures.ix[i, :]), axis=0).reshape(3, 64), pid_label[i])
     else:
-        for i in data.index:
-            input_data[i] = np.concatenate((margins.ix[i, :], shapes.ix[i, :], textures.ix[i, :]), axis=0).reshape(3, 64)
+        if pixels:
+            for i in data.index:
+                input_data[i] = np.concatenate((margins.ix[i, :], shapes.ix[i, :], textures.ix[i, :], np.array(pixels[i]).flatten()), axis=0).reshape(4, 64)
+        else:
+            for i in data.index:
+                input_data[i] = np.concatenate((margins.ix[i, :], shapes.ix[i, :], textures.ix[i, :]), axis=0).reshape(3, 64)
+
     return input_data

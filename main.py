@@ -18,13 +18,16 @@ model_path = 'models/'
 image_path = 'leaf/images/'
 
 pid_label, pid_name, mapping, data = extract('leaf/train.csv')
-# pic_names = [i.name for i in os.scandir(image_path) if i.is_file() and i.name.endswith('.jpg')]
+pic_ids = sorted([int(i.name.replace('.jpg', '')) for i in os.scandir(image_path) if i.is_file() and i.name.endswith('.jpg')])
 input_shape = (8, 8)
+images = dict()
+for i in pic_ids:
+    images[i] = pic_resize(image_path + str(i) + '.jpg', input_shape, pad=True)
 m = input_shape[0] * input_shape[1]  # num of flat array
 n = len(set(pid_name.values()))
-d = 3
+d = 4
 
-input_data = generate_training_set(data, pid_label=pid_label, std=True)
+input_data = generate_training_set(data, pid_label=pid_label, pixels=images, std=True)
 
 # load image into tensor
 
@@ -62,16 +65,16 @@ def max_pool_2x2(x):
 
 
 # First Convolution Layer
-W_conv1 = weight_variable([3, 3, 3, 32])
+W_conv1 = weight_variable([5, 5, d, 32])
 b_conv1 = bias_variable([32])
 
-x_image = tf.reshape(x, [-1, input_shape[0], input_shape[1], 3])
+x_image = tf.reshape(x, [-1, input_shape[0], input_shape[1], d])
 
 h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)
 h_pool1 = max_pool_2x2(h_conv1)
 
 # Second layer
-W_conv2 = weight_variable([3, 3, 32, 64])
+W_conv2 = weight_variable([5, 5, 32, 64])
 b_conv2 = bias_variable([64])
 
 h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
@@ -95,7 +98,7 @@ b_fc2 = bias_variable([n])
 y_conv = tf.matmul(h_fc1_drop, W_fc2) + b_fc2
 
 cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(y_conv, y_))
-train_step = tf.train.AdamOptimizer(learning_rate=1e-4).minimize(cross_entropy)
+train_step = tf.train.AdamOptimizer(learning_rate=5e-4).minimize(cross_entropy)
 correct_prediction = tf.equal(tf.argmax(y_conv, 1), tf.argmax(y_, 1))
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
@@ -137,7 +140,7 @@ def main(loop_num=0):
 
 # cross validation of training photos
 delete_folders()
-cross_val = True
+cross_val = False
 
 kf_iterator = model_selection.StratifiedKFold(n_splits=5, shuffle=True)  # Stratified
 
@@ -163,7 +166,7 @@ for train_index, valid_index in kf_iterator.split(train_x, train_y):
 
     # create batches
     train = np.array(train)
-    batches = batch_iter(data=train, batch_size=200, num_epochs=500, shuffle=True)
+    batches = batch_iter(data=train, batch_size=200, num_epochs=1000, shuffle=True)
 
     valid = np.array(valid)
     valid_x = np.array([i[0] for i in valid])
