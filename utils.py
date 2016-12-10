@@ -3,6 +3,8 @@ import os
 import shutil
 import pandas as pd
 import numpy as np
+import shutil
+from sklearn import preprocessing
 
 
 def extract(train_data):
@@ -56,7 +58,7 @@ def batch_iter(data, batch_size, num_epochs):
             yield epoch, batch_num, data[start_index:end_index]
 
 
-def move_classified(test_order, ans, mapping, dir_path='leaf/images/'):
+def move_classified(test_order, pid_name, ans, mapping, dir_path='leaf/images/'):
     answers = dict()
     for k, i in enumerate(test_order):
         quest = list(ans[k]).index(max(list(ans[k])))
@@ -64,9 +66,31 @@ def move_classified(test_order, ans, mapping, dir_path='leaf/images/'):
         answers[i] = name
         print(i, name)
 
-    for filename in answers.keys():
-        pid = int(filename.split('.')[0])
-        directory = dir_path + 'test/' + answers[filename]
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-        os.rename(dir_path + 'test/' + filename, directory + '/' + filename)
+    for pid in list(pid_name.keys()) + list(answers.keys()):
+        try:
+            directory = dir_path + 'result/' + answers[pid]
+            if not os.path.exists(directory):
+                os.makedirs(directory)
+            shutil.copyfile(str(dir_path + str(pid) + r'.jpg'), str(directory + '/' + str(pid) + r'.jpg'))
+        except KeyError:
+            directory = dir_path + 'result/' + pid_name[pid]
+            if not os.path.exists(directory):
+                os.makedirs(directory)
+            shutil.copyfile(str(dir_path + str(pid) + r'.jpg'), str(directory + '/' + str(pid) + r'.jpg'))
+
+def generate_training_set(data, pid_label, std=True):
+    """ raw data transformation (Standardisation)"""
+    if std:
+        data = data.apply(preprocessing.scale, with_mean=False, with_std=True, axis=0)
+    margins = data.ix[:, data.columns.str.startswith('margin')]
+    shapes = data.ix[:, data.columns.str.startswith('shape')]
+    textures = data.ix[:, data.columns.str.startswith('texture')]
+
+    input_data = dict()
+    if pid_label:
+        for i in data.index:
+            input_data[i] = (np.concatenate((margins.ix[i, :], shapes.ix[i, :], textures.ix[i, :]), axis=0).reshape(3, 64), pid_label[i])
+    else:
+        for i in data.index:
+            input_data[i] = np.concatenate((margins.ix[i, :], shapes.ix[i, :], textures.ix[i, :]), axis=0).reshape(3, 64)
+    return input_data

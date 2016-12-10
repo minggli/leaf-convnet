@@ -1,9 +1,8 @@
 import tensorflow as tf
 import numpy as np
 from sklearn import model_selection
-from utils import delete_folders, extract, pic_resize, batch_iter
+from utils import delete_folders, extract, pic_resize, batch_iter, generate_training_set
 import warnings
-from sklearn import preprocessing
 import os
 warnings.filterwarnings('ignore')
 
@@ -25,17 +24,7 @@ m = input_shape[0] * input_shape[1]  # num of flat array
 n = len(set(pid_name.values()))
 d = 3
 
-# raw data transformation (Standardisation)
-
-data = data.apply(preprocessing.scale, with_mean=False, with_std=True, axis=0)
-margins = data.ix[:, data.columns.str.startswith('margin')]
-shapes = data.ix[:, data.columns.str.startswith('shape')]
-textures = data.ix[:, data.columns.str.startswith('texture')]
-
-input_data = dict()
-
-for i in data.index:
-    input_data[i] = (np.concatenate((margins.ix[i, :], shapes.ix[i, :], textures.ix[i, :]), axis=0).reshape(3, 64), pid_label[i])
+input_data = generate_training_set(data, pid_label=pid_label, std=True)
 
 # load image into tensor
 
@@ -178,7 +167,7 @@ for train_index, valid_index in kf_iterator.split(train_x, train_y):
 
     # create batches
     train = np.array(train)
-    batches = batch_iter(data=train, batch_size=100, num_epochs=500)
+    batches = batch_iter(data=train, batch_size=100, num_epochs=100)
 
     valid = np.array(valid)
     valid_x = np.array([i[0] for i in valid])
