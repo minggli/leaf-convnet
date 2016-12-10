@@ -104,7 +104,6 @@ init = tf.global_variables_initializer()
 sess.run(init)
 
 
-
 # Saver obj
 
 saver = tf.train.Saver()
