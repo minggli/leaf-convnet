@@ -78,6 +78,7 @@ def move_classified(test_order, pid_name, ans, mapping, dir_path='leaf/images/')
                 os.makedirs(directory)
             shutil.copyfile(str(dir_path + str(pid) + r'.jpg'), str(directory + '/' + str(pid) + r'.jpg'))
 
+
 def generate_training_set(data, pid_label, std=True):
     """ raw data transformation (Standardisation)"""
     if std:
