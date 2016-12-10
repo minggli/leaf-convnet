@@ -113,6 +113,7 @@ saver = tf.train.Saver()
 def main(loop_num=0):
 
     print('\n\n\n\n starting cross validation... \n\n\n\n')
+    recent_100 = list()
 
     for batch in batches:
         e = batch[0]
@@ -120,7 +121,6 @@ def main(loop_num=0):
         x_batch, y_batch = zip(*batch[2])
         x_batch = np.array(x_batch)
         y_batch = np.array(y_batch)
-        recent_100 = list()
 
         if i % 5 == 0:
             train_accuracy = accuracy.eval(feed_dict={x: valid_x, y_: valid_y, keep_prob: 1.0}, session=sess)
@@ -166,7 +166,7 @@ for train_index, valid_index in kf_iterator.split(train_x, train_y):
 
     # create batches
     train = np.array(train)
-    batches = batch_iter(data=train, batch_size=200, num_epochs=5000, shuffle=True)
+    batches = batch_iter(data=train, batch_size=200, num_epochs=1000, shuffle=True)
 
     valid = np.array(valid)
     valid_x = np.array([i[0] for i in valid])
