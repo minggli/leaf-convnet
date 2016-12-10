@@ -140,7 +140,7 @@ def main(loop_num=0):
 
 # cross validation of training photos
 delete_folders()
-cross_val = False
+cross_val = True
 
 kf_iterator = model_selection.StratifiedKFold(n_splits=5, shuffle=True)  # Stratified
 
@@ -166,7 +166,7 @@ for train_index, valid_index in kf_iterator.split(train_x, train_y):
 
     # create batches
     train = np.array(train)
-    batches = batch_iter(data=train, batch_size=200, num_epochs=10000, shuffle=True)
+    batches = batch_iter(data=train, batch_size=200, num_epochs=5000, shuffle=True)
 
     valid = np.array(valid)
     valid_x = np.array([i[0] for i in valid])
