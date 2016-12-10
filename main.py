@@ -65,7 +65,7 @@ def max_pool_2x2(x):
 
 
 # First Convolution Layer
-W_conv1 = weight_variable([3, 3, d, 64])
+W_conv1 = weight_variable([4, 4, d, 64])
 b_conv1 = bias_variable([64])
 
 x_image = tf.reshape(x, [-1, input_shape[0], input_shape[1], d])
@@ -74,7 +74,7 @@ h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)
 h_pool1 = max_pool_2x2(h_conv1)
 
 # Second layer
-W_conv2 = weight_variable([3, 3, 64, 64])
+W_conv2 = weight_variable([4, 4, 64, 64])
 b_conv2 = bias_variable([64])
 
 h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
@@ -124,11 +124,7 @@ def main(loop_num=0):
         if i % 5 == 0:
             train_accuracy = accuracy.eval(feed_dict={x: valid_x, y_: valid_y, keep_prob: 1.0}, session=sess)
             print("loop {3}, epoch {2}, step {0}, training accuracy {1:.4f}".format(i, train_accuracy, e, loop_num))
-            recent_100.append(train_accuracy)
-        if len(recent_100) > 100:
-            recent_100.pop(0)
-        if len(recent_100) >= 100 and min(recent_100) == 1:
-            break
+
         train_step.run(feed_dict={x: x_batch, y_: y_batch, keep_prob: 0.5}, session=sess)
 
     if not os.path.exists(model_path):
@@ -139,14 +135,13 @@ def main(loop_num=0):
 
 # cross validation of training photos
 delete_folders()
-cross_val = True
+cross_val = False
 
 kf_iterator = model_selection.StratifiedKFold(n_splits=5, shuffle=True)  # Stratified
 
 train_x = list(pid_name.keys())  # leaf id
 train_y = list(pid_name.values())  # leaf species names
 count = 0
-recent_100 = list()
 
 for train_index, valid_index in kf_iterator.split(train_x, train_y):
 
@@ -166,7 +161,7 @@ for train_index, valid_index in kf_iterator.split(train_x, train_y):
 
     # create batches
     train = np.array(train)
-    batches = batch_iter(data=train, batch_size=200, num_epochs=1000, shuffle=True)
+    batches = batch_iter(data=train, batch_size=200, num_epochs=2000, shuffle=True)
 
     valid = np.array(valid)
     valid_x = np.array([i[0] for i in valid])
