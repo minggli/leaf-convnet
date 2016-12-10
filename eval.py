@@ -25,7 +25,7 @@ n = len(set(pid_name.values()))
 d = 3
 
 # transform
-input_data = generate_training_set(test, pid_label=pid_label, std=True)
+input_data = generate_training_set(test, pid_label=None, std=True)
 
 # load image into tensor
 
@@ -63,8 +63,8 @@ def max_pool_2x2(x):
 
 
 # First Convolution Layer
-W_conv1 = weight_variable([3, 3, d, 32])
-b_conv1 = bias_variable([32])
+W_conv1 = weight_variable([3, 3, d, 64])
+b_conv1 = bias_variable([64])
 
 x_image = tf.reshape(x, [-1, input_shape[0], input_shape[1], d])
 
@@ -72,7 +72,7 @@ h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)
 h_pool1 = max_pool_2x2(h_conv1)
 
 # Second layer
-W_conv2 = weight_variable([3, 3, 32, 64])
+W_conv2 = weight_variable([3, 3, 64, 64])
 b_conv2 = bias_variable([64])
 
 h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
@@ -96,7 +96,7 @@ b_fc2 = bias_variable([n])
 y_conv = tf.matmul(h_fc1_drop, W_fc2) + b_fc2
 
 cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(y_conv, y_))
-train_step = tf.train.AdamOptimizer(learning_rate=1e-4).minimize(cross_entropy)
+train_step = tf.train.AdamOptimizer(learning_rate=5e-4).minimize(cross_entropy)
 correct_prediction = tf.equal(tf.argmax(y_conv, 1), tf.argmax(y_, 1))
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
@@ -131,5 +131,5 @@ data = pd.DataFrame(data=ans, columns=mapping.values(), dtype=np.float32, index=
 data.sort_index(ascending=True, inplace=True)
 data.index.rename('id', inplace=True)
 data.reset_index(drop=False, inplace=True)
-data.to_csv('submission1.csv', encoding='utf-8', header=True, index=False)
+data.to_csv('submission.csv', encoding='utf-8', header=True, index=False)
 
