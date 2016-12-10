@@ -25,9 +25,9 @@ for i in pic_ids:
     images[i] = pic_resize(image_path + str(i) + '.jpg', input_shape, pad=True)
 m = input_shape[0] * input_shape[1]  # num of flat array
 n = len(set(pid_name.values()))
-d = 4
+d = 3
 
-input_data = generate_training_set(data, pid_label=pid_label, pixels=images, std=True)
+input_data = generate_training_set(data, pid_label=pid_label, std=True)
 
 # load image into tensor
 
