@@ -63,7 +63,7 @@ def max_pool_2x2(x):
 
 
 # First Convolution Layer
-W_conv1 = weight_variable([3, 3, d, 64])
+W_conv1 = weight_variable([4, 4, d, 64])
 b_conv1 = bias_variable([64])
 
 x_image = tf.reshape(x, [-1, input_shape[0], input_shape[1], d])
@@ -72,7 +72,7 @@ h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)
 h_pool1 = max_pool_2x2(h_conv1)
 
 # Second layer
-W_conv2 = weight_variable([3, 3, 64, 64])
+W_conv2 = weight_variable([4, 4, 64, 64])
 b_conv2 = bias_variable([64])
 
 h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
