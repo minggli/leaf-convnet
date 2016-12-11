@@ -98,7 +98,7 @@ b_fc2 = bias_variable([n])
 y_conv = tf.matmul(h_fc1_drop, W_fc2) + b_fc2
 
 cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(y_conv, y_))
-train_step = tf.train.AdadeltaOptimizer(learning_rate=5e-4).minimize(cross_entropy)
+train_step = tf.train.GradientDescentOptimizer(learning_rate=5e-3).minimize(cross_entropy)
 correct_prediction = tf.equal(tf.argmax(y_conv, 1), tf.argmax(y_, 1))
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
@@ -161,7 +161,7 @@ for train_index, valid_index in kf_iterator.split(train_x, train_y):
 
     # create batches
     train = np.array(train)
-    batches = batch_iter(data=train, batch_size=200, num_epochs=2000, shuffle=True)
+    batches = batch_iter(data=train, batch_size=200, num_epochs=5000, shuffle=True)
 
     valid = np.array(valid)
     valid_x = np.array([i[0] for i in valid])
