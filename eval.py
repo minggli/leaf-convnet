@@ -1,7 +1,7 @@
 import tensorflow as tf
 import pandas as pd
 import numpy as np
-from utils import delete_folders, extract, pic_resize, batch_iter, move_classified, generate_training_set
+from utilities import delete_folders, extract, pic_resize, batch_iter, move_classified, generate_training_set
 import warnings
 import os
 import pandas as pd
