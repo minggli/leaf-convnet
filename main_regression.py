@@ -36,13 +36,13 @@ regressand = train.select_dtypes(exclude=(np.int8, np.int64, np.float)).copy()
 # codifying types of species
 
 regressand['species_id'] = pd.Categorical.from_array(regressand['species']).codes
-mapping = regressand[['species_id','species']].set_index('species_id').to_dict()['species']
+mapping = regressand[['species_id', 'species']].set_index('species_id').to_dict()['species']
 regressand.drop('species', axis=1, inplace=True)
 regressand = np.ravel(regressand)
 
 # model generalization
 
-kf_generator = model_selection.KFold(n_splits=10, shuffle=True, random_state=1)
+kf_generator = model_selection.KFold(n_splits=5, shuffle=True, random_state=1)
 
 # feature scaling using standard deviation as denominator
 
@@ -58,28 +58,28 @@ regressors = np.column_stack(
     (np.ones(regressors.shape[0]), regressors)
 )  # add constant
 
-# # hold out
-#
-# x_train, x_test, y_train, y_test = model_selection.\
-#     train_test_split(regressors_std, regressand, test_size=.3, random_state=1)
+# hold out
+
+x_train, x_test, y_train, y_test = model_selection.\
+    train_test_split(regressors_std, regressand, test_size=.3, random_state=2)
 
 # fit training set
 
 reg = linear_model.LogisticRegression(fit_intercept=False)
-reg.fit(regressors_std, regressand)
+# ensemble logistic regression overwriting original reg
+# reg = ensemble.AdaBoostClassifier(base_estimator=reg, n_estimators=100)
 
-reg = ensemble.AdaBoostClassifier(base_estimator=reg, n_estimators=100, learning_rate=1, algorithm='SAMME.R',
-                                  random_state=None)
-reg.fit(regressors_std, regressand)
+reg.fit(x_train, y_train)
 
 print('Successfully fitted ensemble Logistic Regression...')
 
-print('Using given feature set from Kaggle, Logistic Regression model accuracy is: ', end='')
+print('Using given feature set from kaggle, Logistic Regression model accuracy is: ', end='')
 
 avg_scores = model_selection.cross_val_score(
     reg, regressors_std, regressand, scoring='accuracy', cv=kf_generator)
 
 print('{0:.2f}%'.format(100 * np.mean(avg_scores)), flush=True, end='\n')
+pred = model_selection.cross_val_predict(reg, regressors_std, regressand, cv=kf_generator)
 
 # combine train and test
 
@@ -117,3 +117,4 @@ else:
     delete_folders(table)
     print('done', flush=True)
     sys.exit()
+
