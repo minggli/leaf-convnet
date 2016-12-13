@@ -66,15 +66,14 @@ regressors = np.column_stack(
 # fit training set
 
 reg = linear_model.LogisticRegression(fit_intercept=False)
-# regressors already contains manually added intercept
-# reg.fit(regressors_std, regressand)
 
 reg = ensemble.AdaBoostClassifier(base_estimator=reg, n_estimators=50, learning_rate=1, algorithm='SAMME.R',
                                   random_state=None)
 reg.fit(regressors_std, regressand)
 
+print('Successfully fitted ensemble Logistic Regression')
 
-print('Using given features by Kaggle, Logistic Regression model accuracy is: ', end='')
+print('Using given feature set from Kaggle, Logistic Regression model accuracy is: ', end='')
 
 avg_scores = model_selection.cross_val_score(
     reg, regressors_std, regressand, scoring='accuracy', cv=kf_generator)
