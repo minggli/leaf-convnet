@@ -3,8 +3,6 @@ import numpy as np
 import warnings
 import sys
 from visual import copy_pics_into_folders, delete_folders
-from GradientDescent import GradientDescent
-import matplotlib.pyplot as plt
 from sklearn import metrics, model_selection, preprocessing, linear_model, ensemble
 warnings.filterwarnings('ignore')
 
@@ -42,7 +40,6 @@ mapping = regressand[['species_id','species']].set_index('species_id').to_dict()
 regressand.drop('species', axis=1, inplace=True)
 regressand = np.ravel(regressand)
 
-
 # model generalization
 
 kf_generator = model_selection.KFold(n_splits=10, shuffle=True, random_state=1)
@@ -70,6 +67,10 @@ regressors = np.column_stack(
 
 reg = linear_model.LogisticRegression(fit_intercept=False)
 # regressors already contains manually added intercept
+# reg.fit(regressors_std, regressand)
+
+reg = ensemble.AdaBoostClassifier(base_estimator=reg, n_estimators=50, learning_rate=1, algorithm='SAMME.R',
+                                  random_state=None)
 reg.fit(regressors_std, regressand)
 
 
@@ -79,25 +80,6 @@ avg_scores = model_selection.cross_val_score(
     reg, regressors_std, regressand, scoring='accuracy', cv=kf_generator)
 
 print('{0:.2f}%'.format(100 * np.mean(avg_scores)), flush=True, end='\n')
-
-# Gradient Descent optimisation algorithm
-
-# old_theta = np.ones(reg.coef_.shape)
-# gd = GradientDescent(alpha=.1, max_epochs=20, conv_thres=.0000001, display=True)
-# gd.fit(reg, regressors_std, regressand)
-# gd.optimise()
-# new_theta, costs = gd.thetas, gd.costs
-# plt.plot(x=range(len(costs)), y=costs)
-# plt.show()
-
-# applying new parameters after optimisation
-
-# reg.coef_ = new_theta
-
-# print('Using given features by Kaggle, Logistic Regression after accuracy Gradient Descent is:', flush=True, end=' ')
-# avg_scores = model_selection.cross_val_score(reg, regressors_std, regressand, scoring='accuracy', cv=kf_generator)
-# print('{0:.2f}%'.format(100 * np.mean(avg_scores)), flush=True, end='\n')
-
 
 # combine train and test
 
@@ -136,4 +118,3 @@ else:
     delete_folders(table)
     print('done', flush=True)
     sys.exit()
-
