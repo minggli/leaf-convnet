@@ -66,12 +66,13 @@ regressors = np.column_stack(
 # fit training set
 
 reg = linear_model.LogisticRegression(fit_intercept=False)
+reg.fit(regressors_std, regressand)
 
-reg = ensemble.AdaBoostClassifier(base_estimator=reg, n_estimators=50, learning_rate=1, algorithm='SAMME.R',
+reg = ensemble.AdaBoostClassifier(base_estimator=reg, n_estimators=100, learning_rate=1, algorithm='SAMME.R',
                                   random_state=None)
 reg.fit(regressors_std, regressand)
 
-print('Successfully fitted ensemble Logistic Regression')
+print('Successfully fitted ensemble Logistic Regression...')
 
 print('Using given feature set from Kaggle, Logistic Regression model accuracy is: ', end='')
 
@@ -99,7 +100,6 @@ table = result[['species_predicted', 'id']].sort_values(by=['species_predicted',
     .set_index('species_predicted')
 
 copy_pics_into_folders(table)
-
 
 key = input('continue to produce submission?\n')
 
