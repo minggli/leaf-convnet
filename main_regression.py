@@ -94,9 +94,9 @@ print('{0:.2f}%'.format(100 * np.mean(avg_scores)), flush=True, end='\n')
 
 # reg.coef_ = new_theta
 
-print('Using given features by Kaggle, Logistic Regression after accuracy Gradient Descent is:', flush=True, end=' ')
-avg_scores = model_selection.cross_val_score(reg, regressors_std, regressand, scoring='accuracy', cv=kf_generator)
-print('{0:.2f}%'.format(100 * np.mean(avg_scores)), flush=True, end='\n')
+# print('Using given features by Kaggle, Logistic Regression after accuracy Gradient Descent is:', flush=True, end=' ')
+# avg_scores = model_selection.cross_val_score(reg, regressors_std, regressand, scoring='accuracy', cv=kf_generator)
+# print('{0:.2f}%'.format(100 * np.mean(avg_scores)), flush=True, end='\n')
 
 
 # combine train and test
