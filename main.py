@@ -13,14 +13,14 @@ __author__ = 'Ming Li'
 
 # params
 
-MODEL_PATH = 'models/'
-IMAGE_PATH = 'leaf/images/'
-INPUT_PATH = 'leaf/'
-
 try:
     EVAL = False if str(sys.argv[1]).upper() != 'EVAL' else True
 except IndexError:
     EVAL = False
+
+MODEL_PATH = 'models/'
+IMAGE_PATH = 'leaf/images/'
+INPUT_PATH = 'leaf/'
 
 pid_label, pid_name, mapping, data = extract('leaf/train.csv')
 pic_ids = sorted([int(i.name.replace('.jpg', '')) for i in os.scandir(IMAGE_PATH) if i.is_file() and i.name.endswith('.jpg')])
