@@ -9,7 +9,7 @@ import os
 
 __author__ = 'Ming Li'
 
-"""This application forms a submission from Ming Li in regards to leaf convnet challenge on Kaggle community"""
+"""This application forms a submission from Ming Li in regards to leaf classification on Kaggle."""
 
 # params
 
