@@ -16,7 +16,7 @@ __author__ = 'Ming Li'
 try:
     EVAL = False if str(sys.argv[1]).upper() != 'EVAL' else True
 except IndexError:
-    EVAL = True
+    EVAL = False
 
 MODEL_PATH = 'models/'
 IMAGE_PATH = 'leaf/images/'
@@ -95,11 +95,11 @@ def _evaluate():
     new_saver = tf.train.import_meta_graph(MODEL_PATH + 'model_epoch_{0}.ckpt.meta'.format(loop_num))
     new_saver.restore(save_path=tf.train.latest_checkpoint(MODEL_PATH), sess=sess)
 
-    probs = sess.run(tf.nn.softmax(logits), feed_dict={x: test_set, keep_prob: 1.0})
+    probs = sess.run(tf.nn.softmax(logits), feed_dict={x: np.array(test_set), keep_prob: 1.0})
 
     move_classified(test_order=test.index, pid_name=pid_name, ans=probs, mapping=mapping)
 
-    df = pd.DataFrame(data=probs, columns=data.columns, dtype=np.float32, index=test.index)
+    df = pd.DataFrame(data=probs, columns=mapping.values(), dtype=np.float32, index=test.index)
     df.to_csv('submission.csv', encoding='utf-8', header=True, index=True)
 
 
@@ -114,7 +114,7 @@ if __name__ == '__main__':
 
     # declare weights and bias unit
 
-    W = tf.Variable(tf.zeros([m, n]), name='weight')
+    W = tf.Variable(tf.zeros([d, m, n]), name='weight')
     b = tf.Variable(tf.zeros([n]), name='bias')
 
     # reshaping input
@@ -196,7 +196,7 @@ else:
 
         # create batches
         train = np.random.permutation(np.array(train))
-        batches = batch_iter(data=train, batch_size=200, num_epochs=5, shuffle=True)
+        batches = batch_iter(data=train, batch_size=200, num_epochs=10, shuffle=True)
 
         valid = np.array(valid)
         valid_x = np.array([i[0] for i in valid])
