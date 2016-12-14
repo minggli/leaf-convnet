@@ -27,12 +27,12 @@ pic_ids = sorted([int(i.name.replace('.jpg', '')) for i in os.scandir(IMAGE_PATH
 input_data = generate_training_set(data, pid_label=pid_label, std=True)
 input_shape = (8, 8)
 images = dict()
+
 for i in pic_ids:
     images[i] = pic_resize(IMAGE_PATH + str(i) + '.jpg', input_shape, pad=True)
 m = input_shape[0] * input_shape[1]  # num of flat array
 n = len(set(pid_name.values()))
 d = 3
-
 
 # load image into tensor
 
@@ -121,14 +121,14 @@ if __name__ == '__main__':
     x_image = tf.reshape(x, [-1, input_shape[0], input_shape[1], 1])
 
     with tf.name_scope('hidden_layer_1'):
-        W_conv1 = weight_variable([3, 3, 1, 32])
+        W_conv1 = weight_variable([5, 5, 1, 32])
         b_conv1 = bias_variable([32])
 
         h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)
         h_pool1 = max_pool(h_conv1)
 
     with tf.name_scope('hidden_layer_2'):
-        W_conv2 = weight_variable([3, 3, 32, 64])
+        W_conv2 = weight_variable([5, 5, 32, 64])
         b_conv2 = bias_variable([64])
 
         h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
@@ -176,7 +176,6 @@ else:
 
     train_x = list(pid_name.keys())  # leaf id
     train_y = list(pid_name.values())  # leaf species names
-    count = 0
 
     for train_index, valid_index in kf_iterator.split(train_x, train_y):
 
@@ -202,8 +201,6 @@ else:
         valid_x = np.array([i[0] for i in valid])
         valid_y = np.array([i[1] for i in valid])
 
-        main(loop_num=count)
-        count += 1
-
+        _train(iterator=batches, optimiser=train_step, metric=accuracy, loss=loss, drop_out=.5)
 
         break
