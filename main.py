@@ -16,7 +16,7 @@ __author__ = 'Ming Li'
 try:
     EVAL = False if str(sys.argv[1]).upper() != 'EVAL' else True
 except IndexError:
-    EVAL = False
+    EVAL = True
 
 MODEL_PATH = 'models/'
 IMAGE_PATH = 'leaf/images/'
@@ -85,13 +85,17 @@ def _evaluate():
     import re
 
     test = pd.read_csv(INPUT_PATH + 'test.csv', index_col='id')
+    input_test = generate_training_set(test, pid_label=None, std=True)
+    test_set = list()
+    for i in test.index:
+        test_set.append(input_test[i])
 
     model_names = [i.name for i in os.scandir(MODEL_PATH) if i.is_file() and i.name.endswith('.meta')]
     loop_num = re.findall("[0-9][0-9]*", model_names.pop())[0]
     new_saver = tf.train.import_meta_graph(MODEL_PATH + 'model_epoch_{0}.ckpt.meta'.format(loop_num))
     new_saver.restore(save_path=tf.train.latest_checkpoint(MODEL_PATH), sess=sess)
 
-    probs = sess.run(tf.nn.softmax(logits), feed_dict={x: test, keep_prob: 1.0})
+    probs = sess.run(tf.nn.softmax(logits), feed_dict={x: test_set, keep_prob: 1.0})
 
     move_classified(test_order=test.index, pid_name=pid_name, ans=probs, mapping=mapping)
 
@@ -192,7 +196,7 @@ else:
 
         # create batches
         train = np.random.permutation(np.array(train))
-        batches = batch_iter(data=train, batch_size=200, num_epochs=5000, shuffle=True)
+        batches = batch_iter(data=train, batch_size=200, num_epochs=5, shuffle=True)
 
         valid = np.array(valid)
         valid_x = np.array([i[0] for i in valid])
