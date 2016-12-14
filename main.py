@@ -84,9 +84,7 @@ def _evaluate():
     import pandas as pd
     import re
 
-    test = pd.read_csv(INPUT_PATH + 'test.csv')
-    test.index += 1
-    test.index.name = 'ImageId'
+    test = pd.read_csv(INPUT_PATH + 'test.csv', index_col='id')
 
     model_names = [i.name for i in os.scandir(MODEL_PATH) if i.is_file() and i.name.endswith('.meta')]
     loop_num = re.findall("[0-9][0-9]*", model_names.pop())[0]
