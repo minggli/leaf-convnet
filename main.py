@@ -196,7 +196,7 @@ else:
 
         # create batches
         train = np.random.permutation(np.array(train))
-        batches = batch_iter(data=train, batch_size=200, num_epochs=10, shuffle=True)
+        batches = batch_iter(data=train, batch_size=200, num_epochs=2000, shuffle=True)
 
         valid = np.array(valid)
         valid_x = np.array([i[0] for i in valid])
