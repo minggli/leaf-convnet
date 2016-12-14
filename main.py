@@ -1,7 +1,7 @@
 import tensorflow as tf
 import numpy as np
 from sklearn import model_selection
-from utilities import delete_folders, extract, pic_resize, batch_iter, generate_training_set
+from utilities import delete_folders, extract, pic_resize, batch_iter, generate_training_set, move_classified
 import sys
 import os
 
@@ -95,11 +95,10 @@ def _evaluate():
 
     probs = sess.run(tf.nn.softmax(logits), feed_dict={x: test, keep_prob: 1.0})
 
+    move_classified(test_order=test.index, pid_name=pid_name, ans=probs, mapping=mapping)
+
     df = pd.DataFrame(data=probs, columns=data.columns, dtype=np.float32, index=test.index)
-    df['Label'] = df.idxmax(axis=1)
-    out = df['Label']
-    df.to_csv('prob.csv', encoding='utf-8', header=True, index=True)
-    out.to_csv('submission.csv', encoding='utf-8', header=True, index=True)
+    df.to_csv('submission.csv', encoding='utf-8', header=True, index=True)
 
 
 if __name__ == '__main__':
