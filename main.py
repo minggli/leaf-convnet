@@ -95,7 +95,7 @@ def _evaluate():
 
     probs = sess.run(tf.nn.softmax(logits), feed_dict={x: test, keep_prob: 1.0})
 
-    df = pd.DataFrame(data=probs, columns=label.columns, dtype=np.float32, index=test.index)
+    df = pd.DataFrame(data=probs, columns=data.columns, dtype=np.float32, index=test.index)
     df['Label'] = df.idxmax(axis=1)
     out = df['Label']
     df.to_csv('prob.csv', encoding='utf-8', header=True, index=True)
