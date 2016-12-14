@@ -108,7 +108,7 @@ if __name__ == '__main__':
 
     # declare placeholders
 
-    x = tf.placeholder(dtype=tf.float32, shape=[None, m], name='feature')
+    x = tf.placeholder(dtype=tf.float32, shape=[None, d, m], name='feature')
     y_ = tf.placeholder(dtype=tf.float32, shape=[None, n], name='label')
 
     # declare weights and bias unit
@@ -118,10 +118,10 @@ if __name__ == '__main__':
 
     # reshaping input
 
-    x_image = tf.reshape(x, [-1, input_shape[0], input_shape[1], 1])
+    x_image = tf.reshape(x, [-1, input_shape[0], input_shape[1], d])
 
     with tf.name_scope('hidden_layer_1'):
-        W_conv1 = weight_variable([5, 5, 1, 32])
+        W_conv1 = weight_variable([5, 5, d, 32])
         b_conv1 = bias_variable([32])
 
         h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)
@@ -135,10 +135,10 @@ if __name__ == '__main__':
         h_pool2 = max_pool(h_conv2)
 
     with tf.name_scope('dense_conn_1'):
-        W_fc1 = weight_variable([7 * 7 * 64, 1024])
+        W_fc1 = weight_variable([2 * 2 * 64, 1024])
         b_fc1 = bias_variable([1024])
 
-        h_pool2_flat = tf.reshape(h_pool2, [-1, 7 * 7 * 64])
+        h_pool2_flat = tf.reshape(h_pool2, [-1, 2 * 2 * 64])
         h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
 
     with tf.name_scope('drop_out'):
@@ -194,13 +194,15 @@ else:
                 valid.append(input_data[pid])
 
         # create batches
-        train = np.array(train)
+        train = np.random.permutation(np.array(train))
         batches = batch_iter(data=train, batch_size=200, num_epochs=5000, shuffle=True)
 
         valid = np.array(valid)
         valid_x = np.array([i[0] for i in valid])
         valid_y = np.array([i[1] for i in valid])
 
-        _train(iterator=batches, optimiser=train_step, metric=accuracy, loss=loss, drop_out=.5)
+        with sess.as_default():
+            sess.run(initializer)
+            _train(iterator=batches, optimiser=train_step, metric=accuracy, loss=loss, drop_out=.5)
 
         break
