@@ -11,7 +11,7 @@ __author__ = 'Ming Li'
 
 """This application forms a submission from Ming Li in regards to leaf classification on Kaggle."""
 
-# params
+# parameters
 
 try:
     EVAL = False if str(sys.argv[1]).upper() != 'EVAL' else True
