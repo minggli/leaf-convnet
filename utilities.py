@@ -58,7 +58,10 @@ def batch_iter(data, batch_size, num_epochs, shuffle=False):
         for batch_num in range(num_batches_per_epoch):
             start_index = batch_num * batch_size
             end_index = min((batch_num + 1) * batch_size, data_size)
-            yield epoch, batch_num, new_data[start_index:end_index]
+            if start_index == end_index:
+                break
+            else:
+                yield epoch, batch_num, new_data[start_index:end_index]
 
 
 def move_classified(test_order, pid_name, ans, mapping, dir_path='leaf/images/'):
