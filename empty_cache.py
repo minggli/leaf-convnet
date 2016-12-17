@@ -1,3 +1,3 @@
-from utils import delete_folders
+from utilities import delete_folders
 
 delete_folders()

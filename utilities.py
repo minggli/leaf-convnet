@@ -61,13 +61,6 @@ def generate_training_set(data, test_size=.05):
     return combined_train, combined_valid
 
 
-def delete_folders(dirs=['test', 'train', 'validation','result'], dir_path='leaf/images/'):
-
-    for directory in dirs:
-        if os.path.exists(dir_path + directory):
-            shutil.rmtree(dir_path + directory)
-
-
 def pic_resize(f_in, size=(96, 96), pad=True):
 
     image = Image.open(f_in)
@@ -109,18 +102,24 @@ def batch_iter(data, batch_size, num_epochs, shuffle=False):
                 yield epoch, batch_num, new_data[start_index:end_index]
 
 
-def move_classified():
+def move_classified(test_data, train_data, columns, index, path='leaf/images/'):
     """moving classified photos together in labeled folder to eye testing"""
 
-    test_df = pd.DataFrame(data=raw, columns=label.columns, index=test.index)
-    test_df['species'] = test_df.columns[test_df.idxmax(axis=1)]
+    test_df = pd.DataFrame(data=test_data, columns=columns, index=index)
+    test_df['species'] = test_df.idxmax(axis=1)
 
-    print(test_df['species'])
+    combined_df = pd.concat([test_df['species'], train_data['species']], axis=0).sort_index()
 
-    combined_df = pd.concat([test_df['species'], data['species']], axis=0)
-
-    for pid in combined_df.index:
-        directory = IMAGE_PATH + 'result/' + str(combined_df[pid].values)
+    for index in combined_df.index:
+        pid = int(index)
+        directory = path + 'result/' + combined_df[pid]
         if not os.path.exists(directory):
             os.makedirs(directory)
-        shutil.copyfile(IMAGE_PATH + pid + '.jpg', directory + '/' + pid + '.jpg')
+        shutil.copyfile(path + str(pid) + '.jpg', directory + '/' + str(pid) + '.jpg')
+
+
+def delete_folders(dirs=['test', 'train', 'validation','result'], path='leaf/images/'):
+
+    for directory in dirs:
+        if os.path.exists(path + directory):
+            shutil.rmtree(path + directory)
