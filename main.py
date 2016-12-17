@@ -27,6 +27,7 @@ m = functools.reduce(operator.mul, input_shape, 1)
 n = len(set(label))
 d = 3
 
+print(sys.argv[1:])
 
 EVAL = True if 'EVAL' in map(str.upper, sys.argv[1:]) else False
 
@@ -97,7 +98,7 @@ def submit(raw):
 
     # move_classified(test_order=test.index, pid_name=pid_name, ans=probs, mapping=mapping)
 
-    df = pd.DataFrame(data=raw, columns=label.columns, dtype=np.float32, index=test_data.index)
+    df = pd.DataFrame(data=raw, columns=label.columns, dtype=np.float32, index=test.index)
     df.to_csv('submission.csv', encoding='utf-8', header=True, index=True)
 
 
