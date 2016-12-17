@@ -40,7 +40,7 @@ else:
 
 train_data = transform(data=train, label=label, pixels=images_lib, standardize=True)
 
-
+print(IMAGE, d, images_lib)
 # load image into tensor
 
 
@@ -129,7 +129,7 @@ if __name__ == '__main__':
         h_pool1 = max_pool(h_conv1)
 
     with tf.name_scope('hidden_layer_2'):
-        W_conv2 = weight_variable([5, 5, 32, 64])
+        W_conv2 = weight_variable([3, 3, 32, 64])
         b_conv2 = bias_variable([64])
 
         h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
@@ -203,7 +203,7 @@ if __name__ == '__main__':
         for loop in range(ENSEMBLE):
 
             train_set, valid_set = \
-                generate_training_set(data=train_data, test_size=0.20)
+                generate_training_set(data=train_data, test_size=0.15)
 
             batches = batch_iter(data=train_set, batch_size=200, num_epochs=5, shuffle=True)
 
