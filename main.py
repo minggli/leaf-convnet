@@ -19,26 +19,27 @@ MODEL_PATH = 'models/'
 IMAGE_PATH = 'leaf/images/'
 INPUT_PATH = 'leaf/'
 
-train, label, data = extract(INPUT_PATH + 'train.csv', target='species')
-train_data = transform(data=train, label=label, pixels=None, standardize=True)
-input_shape = (8, 8)
 num_ensemble = 5
+train, label, data = extract(INPUT_PATH + 'train.csv', target='species')
+input_shape = (8, 8)
 m = functools.reduce(operator.mul, input_shape, 1)
 n = len(set(label))
-d = 3
 
 print(sys.argv[1:])
 
 EVAL = True if 'EVAL' in map(str.upper, sys.argv[1:]) else False
-
 ENSEMBLE = num_ensemble if 'ENSEMBLE' in map(str.upper, sys.argv[1:]) else 1
-
 IMAGE = True if 'IMAGE' in map(str.upper, sys.argv[1:]) else False
 
-# images_lib = dict()
-# for i in pic_ids:
-#     images_lib[i] = pic_resize(IMAGE_PATH + str(i) + '.jpg', input_shape, pad=True)
-# pic_ids = sorted([int(i.name.replace('.jpg', '')) for i in os.scandir(IMAGE_PATH) if i.is_file() and i.name.endswith('.jpg')])
+d = 3 if not IMAGE else 4
+
+if IMAGE:
+    images_lib = {k: pic_resize(IMAGE_PATH + str(k) + '.jpg', input_shape, pad=True) for k in range(1, 1585, 1)}
+else:
+    images_lib = None
+
+train_data = transform(data=train, label=label, pixels=images_lib, standardize=True)
+
 
 # load image into tensor
 
@@ -178,7 +179,7 @@ if __name__ == '__main__':
         val_probs = []
 
         _, _, test = extract(INPUT_PATH + 'test.csv')
-        test_data = transform(data=test, label=None, pixels=None, standardize=True)
+        test_data = transform(data=test, label=None, pixels=images_lib, standardize=True)
 
         for loop in range(ENSEMBLE):
 
@@ -204,7 +205,7 @@ if __name__ == '__main__':
             train_set, valid_set = \
                 generate_training_set(data=train_data, test_size=0.20)
 
-            batches = batch_iter(data=train_set, batch_size=200, num_epochs=2000, shuffle=True)
+            batches = batch_iter(data=train_set, batch_size=200, num_epochs=5, shuffle=True)
 
             with sess.as_default():
                 sess.run(initializer)
