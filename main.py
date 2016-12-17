@@ -40,7 +40,6 @@ else:
 
 train_data = transform(data=train, label=label, pixels=images_lib, standardize=True)
 
-print(IMAGE, d, images_lib)
 # load image into tensor
 
 
@@ -170,7 +169,7 @@ if __name__ == '__main__':
     if EVAL:
 
         _, valid_set = \
-            generate_training_set(data=train_data, test_size=0.80)
+            generate_training_set(data=train_data, test_size=0.90)
 
         _, valid_y = zip(*valid_set)
 
@@ -203,9 +202,9 @@ if __name__ == '__main__':
         for loop in range(ENSEMBLE):
 
             train_set, valid_set = \
-                generate_training_set(data=train_data, test_size=0.15)
+                generate_training_set(data=train_data, test_size=0.10)
 
-            batches = batch_iter(data=train_set, batch_size=200, num_epochs=5, shuffle=True)
+            batches = batch_iter(data=train_set, batch_size=200, num_epochs=3000, shuffle=True)
 
             with sess.as_default():
                 sess.run(initializer)
