@@ -17,30 +17,33 @@ def extract(file, target=None):
     return train, label, data
 
 
-def transform(data, label, pixels=None, standardize=True):
+def transform(data, label, dim, pixels=None, normalize=True):
     """standard scaling and turning data into 3-dim array for either train or test"""
 
-    if standardize:
+    if pixels is not None:
+        img = pd.DataFrame.from_dict(data=pixels, orient='index')
+
+    if normalize:
         data = data.apply(preprocessing.scale, with_mean=False, with_std=True, axis=0)
+        if pixels is not None:
+            img = img.apply(preprocessing.minmax_scale, feature_range=(0, 1), axis=0)
 
     margins = data.ix[:, data.columns.str.startswith('margin')]
     shapes = data.ix[:, data.columns.str.startswith('shape')]
     textures = data.ix[:, data.columns.str.startswith('texture')]
 
-    d = 4 if pixels is not None else 3
-
     if label is not None and pixels is not None:
         transformed = \
-            [(np.concatenate((margins.ix[i, :], shapes.ix[i, :], textures.ix[i, :], np.array(pixels[i]).flatten()), axis=0).reshape(d, 64), label.ix[i, :]) for i in data.index]
+            [(np.concatenate((margins.ix[i, :], shapes.ix[i, :], textures.ix[i, :], img.ix[i, :]), axis=0).reshape(dim, 64), label.ix[i, :]) for i in data.index]
     if label is not None and pixels is None:
         transformed = \
-            [(np.concatenate((margins.ix[i, :], shapes.ix[i, :], textures.ix[i, :]), axis=0).reshape(d, 64), label.ix[i, :]) for i in data.index]
+            [(np.concatenate((margins.ix[i, :], shapes.ix[i, :], textures.ix[i, :]), axis=0).reshape(dim, 64), label.ix[i, :]) for i in data.index]
     if label is None and pixels is not None:
         transformed = \
-            [np.concatenate((margins.ix[i, :], shapes.ix[i, :], textures.ix[i, :], np.array(pixels[i]).flatten()), axis=0).reshape(d, 64) for i in data.index]
+            [np.concatenate((margins.ix[i, :], shapes.ix[i, :], textures.ix[i, :], img.ix[i, :]), axis=0).reshape(dim, 64) for i in data.index]
     if label is None and pixels is None:
         transformed = \
-            [np.concatenate((margins.ix[i, :], shapes.ix[i, :], textures.ix[i, :]), axis=0).reshape(d, 64) for i in data.index]
+            [np.concatenate((margins.ix[i, :], shapes.ix[i, :], textures.ix[i, :]), axis=0).reshape(dim, 64) for i in data.index]
 
     return np.array(transformed)
 
@@ -79,7 +82,7 @@ def pic_resize(f_in, size=(96, 96), pad=True):
     else:
         thumb = ImageOps.fit(image, size, Image.ANTIALIAS, (0.5, 0.5))
 
-    return thumb
+    return np.array(thumb).flatten()
 
 
 def batch_iter(data, batch_size, num_epochs, shuffle=False):

@@ -38,7 +38,7 @@ if IMAGE:
 else:
     images_lib = None
 
-train_data = transform(data=train, label=label, pixels=images_lib, standardize=True)
+train_data = transform(data=train, label=label, dim=d, pixels=images_lib, normalize=True)
 
 # load image into tensor
 
@@ -178,7 +178,7 @@ if __name__ == '__main__':
         val_probs = []
 
         _, _, test = extract(INPUT_PATH + 'test.csv')
-        test_data = transform(data=test, label=None, pixels=images_lib, standardize=True)
+        test_data = transform(data=test, label=None, dim=d, pixels=images_lib, normalize=True)
 
         for loop in range(ENSEMBLE):
 
@@ -204,7 +204,7 @@ if __name__ == '__main__':
             train_set, valid_set = \
                 generate_training_set(data=train_data, test_size=0.10)
 
-            batches = batch_iter(data=train_set, batch_size=200, num_epochs=3000, shuffle=True)
+            batches = batch_iter(data=train_set, batch_size=200, num_epochs=2000, shuffle=True)
 
             with sess.as_default():
                 sess.run(initializer)
