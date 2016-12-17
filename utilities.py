@@ -21,7 +21,7 @@ def transform(data, label, dim, pixels=None, normalize=True):
     """standard scaling and turning data into 3-dim array for either train or test"""
 
     if pixels is not None:
-        img = pd.DataFrame.from_dict(data=pixels, orient='index')
+        img = pd.DataFrame.from_dict(data=pixels, orient='index', dtype=np.float32)
 
     if normalize:
         data = data.apply(preprocessing.scale, with_mean=False, with_std=True, axis=0)
