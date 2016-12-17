@@ -96,7 +96,7 @@ def evaluate(test, metric, valid_set):
 
 def submit(raw):
 
-    # move_classified(test_order=test.index, pid_name=pid_name, ans=probs, mapping=mapping)
+    move_classified()
 
     df = pd.DataFrame(data=raw, columns=label.columns, dtype=np.float32, index=test.index)
     df.to_csv('submission.csv', encoding='utf-8', header=True, index=True)
@@ -216,4 +216,3 @@ if __name__ == '__main__':
 
             save_path = saver.save(sess, MODEL_PATH + "model_ensemble_loop_{0}.ckpt".format(loop))
             print("Model saved in file: {0}".format(save_path))
-

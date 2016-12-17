@@ -1,6 +1,5 @@
 from PIL import Image, ImageChops, ImageOps
 import os
-import shutil
 import pandas as pd
 import numpy as np
 import shutil
@@ -110,24 +109,18 @@ def batch_iter(data, batch_size, num_epochs, shuffle=False):
                 yield epoch, batch_num, new_data[start_index:end_index]
 
 
-def move_classified(test_order, pid_name, ans, mapping, dir_path='leaf/images/'):
-    answers = dict()
-    for k, i in enumerate(test_order):
-        quest = list(ans[k]).index(max(list(ans[k])))
-        name = mapping[quest]
-        answers[i] = name
-        print(i, name)
+def move_classified():
+    """moving classified photos together in labeled folder to eye testing"""
 
-    for pid in list(pid_name.keys()) + list(answers.keys()):
-        try:
-            directory = dir_path + 'result/' + answers[pid]
-            if not os.path.exists(directory):
-                os.makedirs(directory)
-            shutil.copyfile(str(dir_path + str(pid) + r'.jpg'), str(directory + '/' + str(pid) + r'.jpg'))
-        except KeyError:
-            directory = dir_path + 'result/' + pid_name[pid]
-            if not os.path.exists(directory):
-                os.makedirs(directory)
-            shutil.copyfile(str(dir_path + str(pid) + r'.jpg'), str(directory + '/' + str(pid) + r'.jpg'))
+    test_df = pd.DataFrame(data=raw, columns=label.columns, index=test.index)
+    test_df['species'] = test_df.columns[test_df.idxmax(axis=1)]
 
+    print(test_df['species'])
 
+    combined_df = pd.concat([test_df['species'], data['species']], axis=0)
+
+    for pid in combined_df.index:
+        directory = IMAGE_PATH + 'result/' + str(combined_df[pid].values)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        shutil.copyfile(IMAGE_PATH + pid + '.jpg', directory + '/' + pid + '.jpg')
