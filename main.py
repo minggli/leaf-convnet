@@ -169,7 +169,7 @@ if __name__ == '__main__':
     if EVAL:
 
         _, valid_set = \
-            generate_training_set(data=train_data, test_size=0.95)
+            generate_training_set(data=train_data, test_size=0.80)
 
         _, valid_y = zip(*valid_set)
 
@@ -204,7 +204,7 @@ if __name__ == '__main__':
             train_set, valid_set = \
                 generate_training_set(data=train_data, test_size=0.20)
 
-            batches = batch_iter(data=train_set, batch_size=200, num_epochs=5, shuffle=True)
+            batches = batch_iter(data=train_set, batch_size=200, num_epochs=2000, shuffle=True)
 
             with sess.as_default():
                 sess.run(initializer)
