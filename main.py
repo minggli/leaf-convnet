@@ -202,7 +202,7 @@ if __name__ == '__main__':
         for loop in range(ENSEMBLE):
 
             train_set, valid_set = \
-                generate_training_set(data=train_data, test_size=0.05)
+                generate_training_set(data=train_data, test_size=0.15)
 
             batches = batch_iter(data=train_set, batch_size=200, num_epochs=1000, shuffle=True)
 
