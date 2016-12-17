@@ -7,15 +7,69 @@ import shutil
 from sklearn import preprocessing
 
 
-def extract(train_data):
-    train = pd.read_csv(train_data, index_col=['id'])
-    mapping = {k: v for k, v in enumerate(pd.get_dummies(train['species']).columns)}
-    dummies = pd.get_dummies(train['species'])
-    dummies.columns = mapping.keys()
-    pid_label = dict(zip(train.index, np.array(dummies)))
-    id_name = dict(zip(train.index, train['species']))
-    data = train.ix[:, ~train.columns.isin(['species'])]
-    return pid_label, id_name, mapping, data
+def extract(file):
+    data = pd.read_csv(file, index_col=['id'])
+    label = pd.get_dummies(data['species'])
+    train = data.drop(['species'], axis=1)
+    return train, label, data
+
+
+def transform(data, label, pixels=None, standardize=True):
+    """standard scaling and turning data into 3-dim array for either train or test"""
+
+    if standardize:
+        data = data.apply(preprocessing.scale, with_mean=False, with_std=True, axis=0)
+
+    margins = data.ix[:, data.columns.str.startswith('margin')]
+    shapes = data.ix[:, data.columns.str.startswith('shape')]
+    textures = data.ix[:, data.columns.str.startswith('texture')]
+
+    d = 4 if pixels is not None else 3
+
+    if label is not None and pixels is not None:
+        transformed = \
+            [(np.concatenate((margins.ix[i, :], shapes.ix[i, :], textures.ix[i, :], np.array(pixels[i]).flatten()), axis=0).reshape(d, 64), label.ix[i, :]) for i in data.index]
+    if label is not None and pixels is None:
+        transformed = \
+            [(np.concatenate((margins.ix[i, :], shapes.ix[i, :], textures.ix[i, :]), axis=0).reshape(d, 64), label.ix[i, :]) for i in data.index]
+    if label is None and pixels is not None:
+        transformed = \
+            [np.concatenate((margins.ix[i, :], shapes.ix[i, :], textures.ix[i, :], np.array(pixels[i]).flatten()), axis=0).reshape(d, 64) for i in data.index]
+    if label is None and pixels is None:
+        transformed = \
+            [np.concatenate((margins.ix[i, :], shapes.ix[i, :], textures.ix[i, :]), axis=0).reshape(d, 64) for i in data.index]
+
+    return np.array(transformed)
+
+
+# def generate_training_set(data, label, pixels=None, std=True):
+#     """ raw data transformation (standardisation)"""
+#
+#     if std:
+#         data = data.apply(preprocessing.scale, with_mean=False, with_std=True, axis=0)
+#
+#     margins = data.ix[:, data.columns.str.startswith('margin')]
+#     shapes = data.ix[:, data.columns.str.startswith('shape')]
+#     textures = data.ix[:, data.columns.str.startswith('texture')]
+#
+#     input_data = dict()
+#
+#     if label:
+#         if pixels:
+#             for i in data.index:
+#                 input_data[i] = (np.concatenate((margins.ix[i, :], shapes.ix[i, :], textures.ix[i, :], np.array(pixels[i]).flatten()), axis=0).reshape(4, 64), pid_label[i])
+#         else:
+#             for i in data.index:
+#                 input_data[i] = (np.concatenate((margins.ix[i, :], shapes.ix[i, :], textures.ix[i, :]), axis=0).reshape(3, 64), pid_label[i])
+#     else:
+#         if pixels:
+#             for i in data.index:
+#                 input_data[i] = np.concatenate((margins.ix[i, :], shapes.ix[i, :], textures.ix[i, :], np.array(pixels[i]).flatten()), axis=0).reshape(4, 64)
+#         else:
+#             for i in data.index:
+#                 input_data[i] = np.concatenate((margins.ix[i, :], shapes.ix[i, :], textures.ix[i, :]), axis=0).reshape(3, 64)
+#
+#     return input_data
 
 
 def delete_folders(dirs=['test', 'train', 'validation','result'], dir_path='leaf/images/'):
@@ -85,29 +139,3 @@ def move_classified(test_order, pid_name, ans, mapping, dir_path='leaf/images/')
             shutil.copyfile(str(dir_path + str(pid) + r'.jpg'), str(directory + '/' + str(pid) + r'.jpg'))
 
 
-def generate_training_set(data, pid_label, pixels=None, std=True):
-    """ raw data transformation (standardisation)"""
-    if std:
-        data = data.apply(preprocessing.scale, with_mean=False, with_std=True, axis=0)
-    margins = data.ix[:, data.columns.str.startswith('margin')]
-    shapes = data.ix[:, data.columns.str.startswith('shape')]
-    textures = data.ix[:, data.columns.str.startswith('texture')]
-
-    input_data = dict()
-
-    if pid_label:
-        if pixels:
-            for i in data.index:
-                input_data[i] = (np.concatenate((margins.ix[i, :], shapes.ix[i, :], textures.ix[i, :], np.array(pixels[i]).flatten()), axis=0).reshape(4, 64), pid_label[i])
-        else:
-            for i in data.index:
-                input_data[i] = (np.concatenate((margins.ix[i, :], shapes.ix[i, :], textures.ix[i, :]), axis=0).reshape(3, 64), pid_label[i])
-    else:
-        if pixels:
-            for i in data.index:
-                input_data[i] = np.concatenate((margins.ix[i, :], shapes.ix[i, :], textures.ix[i, :], np.array(pixels[i]).flatten()), axis=0).reshape(4, 64)
-        else:
-            for i in data.index:
-                input_data[i] = np.concatenate((margins.ix[i, :], shapes.ix[i, :], textures.ix[i, :]), axis=0).reshape(3, 64)
-
-    return input_data

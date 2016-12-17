@@ -1,7 +1,10 @@
 import tensorflow as tf
 import numpy as np
 from sklearn import model_selection
-from utilities import delete_folders, extract, pic_resize, batch_iter, generate_training_set, move_classified
+from utilities import delete_folders, extract, pic_resize, batch_iter, transform, move_classified
+import pandas as pd
+import functools
+import operator
 import sys
 import os
 
@@ -13,26 +16,26 @@ __author__ = 'Ming Li'
 
 # parameters
 
-try:
-    EVAL = False if str(sys.argv[1]).upper() != 'EVAL' else True
-except IndexError:
-    EVAL = False
-
 MODEL_PATH = 'models/'
 IMAGE_PATH = 'leaf/images/'
 INPUT_PATH = 'leaf/'
 
-pid_label, pid_name, mapping, data = extract('leaf/train.csv')
-pic_ids = sorted([int(i.name.replace('.jpg', '')) for i in os.scandir(IMAGE_PATH) if i.is_file() and i.name.endswith('.jpg')])
-input_data = generate_training_set(data, pid_label=pid_label, std=True)
+train, label, data = extract('leaf/train.csv')
+# pic_ids = sorted([int(i.name.replace('.jpg', '')) for i in os.scandir(IMAGE_PATH) if i.is_file() and i.name.endswith('.jpg')])
+train_data = transform(data=train, label=label, pixels=None, standardize=True)
 input_shape = (8, 8)
-images = dict()
-
-for i in pic_ids:
-    images[i] = pic_resize(IMAGE_PATH + str(i) + '.jpg', input_shape, pad=True)
-m = input_shape[0] * input_shape[1]  # num of flat array
-n = len(set(pid_name.values()))
+num_ensemble = 5
+m = functools.reduce(operator.mul, input_shape, 1)
+n = len(set(label))
 d = 3
+
+images_lib = dict()
+for i in pic_ids:
+    images_lib[i] = pic_resize(IMAGE_PATH + str(i) + '.jpg', input_shape, pad=True)
+
+EVAL = True if 'EVAL' in map(str.upper, sys.argv[1:]) else False
+
+ENSEMBLE = num_ensemble if 'ENSEMBLE' in map(str.upper, sys.argv[1:]) else 1
 
 # load image into tensor
 
@@ -71,18 +74,12 @@ def _train(iterator, optimiser, metric, loss, drop_out=.5):
 
         optimiser.run(feed_dict={x: x_batch, y_: y_batch, keep_prob: drop_out})
 
-        if i % 5 == 0:
-            train_accuracy, loss_score = sess.run([metric, loss], feed_dict={x: valid_x, y_: valid_y, keep_prob: 1.0})
-            print("epoch {2}, step {0}, training accuracy {1:.4f}, loss {3:.4f}".format(i, train_accuracy, epoch, loss_score))
 
     save_path = saver.save(sess, MODEL_PATH + "model_epoch_{0}.ckpt".format(epoch))
     print("Model saved in file: {0}".format(save_path))
 
 
-def _evaluate():
-
-    import pandas as pd
-    import re
+def evaluate(test, metric, valid_set):
 
     test = pd.read_csv(INPUT_PATH + 'test.csv', index_col='id')
     input_test = generate_training_set(test, pid_label=None, std=True)
@@ -90,16 +87,22 @@ def _evaluate():
     for i in test.index:
         test_set.append(input_test[i])
 
-    model_names = [i.name for i in os.scandir(MODEL_PATH) if i.is_file() and i.name.endswith('.meta')]
-    loop_num = re.findall("[0-9][0-9]*", model_names.pop())[0]
-    new_saver = tf.train.import_meta_graph(MODEL_PATH + 'model_epoch_{0}.ckpt.meta'.format(loop_num))
-    new_saver.restore(save_path=tf.train.latest_checkpoint(MODEL_PATH), sess=sess)
+    if i % 5 == 0:
+        train_accuracy, loss_score = sess.run([metric, loss], feed_dict={x: valid_x, y_: valid_y, keep_prob: 1.0})
+        print("epoch {2}, step {0}, training accuracy {1:.4f}, loss {3:.4f}".format(i, train_accuracy, epoch, loss_score))
+
+    # model_names = [i.name for i in os.scandir(MODEL_PATH) if i.is_file() and i.name.endswith('.meta')]
+    # loop = re.findall("[0-9][0-9]*", model_names.pop())[0]
+    new_saver = tf.train.import_meta_graph(MODEL_PATH + 'model_ensemble_loop_{0}.ckpt.meta'.format(loop))
+    new_saver.restore(save_path=MODEL_PATH + 'model_ensemble_loop_{0}.ckpt.meta'.format(loop), sess=sess)
 
     probs = sess.run(tf.nn.softmax(logits), feed_dict={x: np.array(test_set), keep_prob: 1.0})
 
+
+def submit(raw):
     move_classified(test_order=test.index, pid_name=pid_name, ans=probs, mapping=mapping)
 
-    df = pd.DataFrame(data=probs, columns=mapping.values(), dtype=np.float32, index=test.index)
+    df = pd.DataFrame(data=raw, columns=mapping.values(), dtype=np.float32, index=test.index)
     df.to_csv('submission.csv', encoding='utf-8', header=True, index=True)
 
 
