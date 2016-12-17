@@ -7,10 +7,14 @@ import shutil
 from sklearn import preprocessing
 
 
-def extract(file):
+def extract(file, target=None):
     data = pd.read_csv(file, index_col=['id'])
-    label = pd.get_dummies(data['species'])
-    train = data.drop(['species'], axis=1)
+    if target in data.columns:
+        label = pd.get_dummies(data[target])
+        train = data.drop([target], axis=1)
+    else:
+        label = None
+        train = None
     return train, label, data
 
 
@@ -42,34 +46,20 @@ def transform(data, label, pixels=None, standardize=True):
     return np.array(transformed)
 
 
-# def generate_training_set(data, label, pixels=None, std=True):
-#     """ raw data transformation (standardisation)"""
-#
-#     if std:
-#         data = data.apply(preprocessing.scale, with_mean=False, with_std=True, axis=0)
-#
-#     margins = data.ix[:, data.columns.str.startswith('margin')]
-#     shapes = data.ix[:, data.columns.str.startswith('shape')]
-#     textures = data.ix[:, data.columns.str.startswith('texture')]
-#
-#     input_data = dict()
-#
-#     if label:
-#         if pixels:
-#             for i in data.index:
-#                 input_data[i] = (np.concatenate((margins.ix[i, :], shapes.ix[i, :], textures.ix[i, :], np.array(pixels[i]).flatten()), axis=0).reshape(4, 64), pid_label[i])
-#         else:
-#             for i in data.index:
-#                 input_data[i] = (np.concatenate((margins.ix[i, :], shapes.ix[i, :], textures.ix[i, :]), axis=0).reshape(3, 64), pid_label[i])
-#     else:
-#         if pixels:
-#             for i in data.index:
-#                 input_data[i] = np.concatenate((margins.ix[i, :], shapes.ix[i, :], textures.ix[i, :], np.array(pixels[i]).flatten()), axis=0).reshape(4, 64)
-#         else:
-#             for i in data.index:
-#                 input_data[i] = np.concatenate((margins.ix[i, :], shapes.ix[i, :], textures.ix[i, :]), axis=0).reshape(3, 64)
-#
-#     return input_data
+def generate_training_set(data, test_size=.05):
+
+    index = len(data)
+    random_index = np.random.permutation(index)
+
+    train_size = int((1 - test_size) * index)
+
+    train_index = random_index[:train_size]
+    test_index = random_index[train_size:]
+
+    combined_train = data[train_index]
+    combined_valid = data[test_index]
+
+    return combined_train, combined_valid
 
 
 def delete_folders(dirs=['test', 'train', 'validation','result'], dir_path='leaf/images/'):
@@ -102,8 +92,10 @@ def pic_resize(f_in, size=(96, 96), pad=True):
 
 def batch_iter(data, batch_size, num_epochs, shuffle=False):
     """batch iterator"""
+
     data_size = len(data)
-    num_batches_per_epoch = int(len(data)/batch_size) + 1
+    num_batches_per_epoch = int(data_size/batch_size) + 1
+
     for epoch in range(num_epochs):
         if shuffle:
             new_data = np.random.permutation(data)
@@ -111,7 +103,7 @@ def batch_iter(data, batch_size, num_epochs, shuffle=False):
             new_data = data
         for batch_num in range(num_batches_per_epoch):
             start_index = batch_num * batch_size
-            end_index = min((batch_num + 1) * batch_size, data_size)
+            end_index = min(start_index + batch_size, data_size)
             if start_index == end_index:
                 break
             else:

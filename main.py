@@ -1,7 +1,6 @@
 import tensorflow as tf
 import numpy as np
-from sklearn import model_selection
-from utilities import delete_folders, extract, pic_resize, batch_iter, transform, move_classified
+from utilities import delete_folders, extract, pic_resize, batch_iter, transform, move_classified, generate_training_set
 import pandas as pd
 import functools
 import operator
@@ -12,7 +11,7 @@ import os
 
 __author__ = 'Ming Li'
 
-"""This application forms a submission from Ming Li in regards to leaf classification on Kaggle."""
+"""This app from Ming Li is for leaf classification on Kaggle."""
 
 # parameters
 
@@ -20,8 +19,7 @@ MODEL_PATH = 'models/'
 IMAGE_PATH = 'leaf/images/'
 INPUT_PATH = 'leaf/'
 
-train, label, data = extract('leaf/train.csv')
-# pic_ids = sorted([int(i.name.replace('.jpg', '')) for i in os.scandir(IMAGE_PATH) if i.is_file() and i.name.endswith('.jpg')])
+train, label, data = extract(INPUT_PATH + 'train.csv', target='species')
 train_data = transform(data=train, label=label, pixels=None, standardize=True)
 input_shape = (8, 8)
 num_ensemble = 5
@@ -29,13 +27,17 @@ m = functools.reduce(operator.mul, input_shape, 1)
 n = len(set(label))
 d = 3
 
-images_lib = dict()
-for i in pic_ids:
-    images_lib[i] = pic_resize(IMAGE_PATH + str(i) + '.jpg', input_shape, pad=True)
 
 EVAL = True if 'EVAL' in map(str.upper, sys.argv[1:]) else False
 
 ENSEMBLE = num_ensemble if 'ENSEMBLE' in map(str.upper, sys.argv[1:]) else 1
+
+IMAGE = True if 'IMAGE' in map(str.upper, sys.argv[1:]) else False
+
+# images_lib = dict()
+# for i in pic_ids:
+#     images_lib[i] = pic_resize(IMAGE_PATH + str(i) + '.jpg', input_shape, pad=True)
+# pic_ids = sorted([int(i.name.replace('.jpg', '')) for i in os.scandir(IMAGE_PATH) if i.is_file() and i.name.endswith('.jpg')])
 
 # load image into tensor
 
@@ -58,14 +60,13 @@ def max_pool(x):
     return tf.nn.max_pool(x, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
 
 
-def _train(iterator, optimiser, metric, loss, drop_out=.5):
+def _train(train_iterator, valid_set, optimiser, metric, loss, drop_out=.5):
 
-    print('\n\n\n\n starting cross validation... \n\n\n\n')
+    print('\n\n\n\n starting neural network #{}... \n\n\n\n'. format(loop))
 
-    if not os.path.exists(MODEL_PATH):
-        os.makedirs(MODEL_PATH)
+    valid_x, valid_y = zip(*valid_set)
 
-    for batch in iterator:
+    for batch in train_iterator:
         epoch = batch[0]
         i = batch[1]
         x_batch, y_batch = zip(*batch[2])
@@ -74,35 +75,29 @@ def _train(iterator, optimiser, metric, loss, drop_out=.5):
 
         optimiser.run(feed_dict={x: x_batch, y_: y_batch, keep_prob: drop_out})
 
-
-    save_path = saver.save(sess, MODEL_PATH + "model_epoch_{0}.ckpt".format(epoch))
-    print("Model saved in file: {0}".format(save_path))
+        if i % 5 == 0:
+            valid_accuracy, loss_score = sess.run([metric, loss], feed_dict={x: valid_x, y_: valid_y, keep_prob: 1.0})
+            print("loop {4}, epoch {2}, step {0}, validation accuracy {1:.4f}, loss {3:.4f}".format(i, valid_accuracy, epoch, loss_score, loop))
 
 
 def evaluate(test, metric, valid_set):
 
-    test = pd.read_csv(INPUT_PATH + 'test.csv', index_col='id')
-    input_test = generate_training_set(test, pid_label=None, std=True)
-    test_set = list()
-    for i in test.index:
-        test_set.append(input_test[i])
+    valid_x, valid_y = zip(*valid_set)
 
-    if i % 5 == 0:
-        train_accuracy, loss_score = sess.run([metric, loss], feed_dict={x: valid_x, y_: valid_y, keep_prob: 1.0})
-        print("epoch {2}, step {0}, training accuracy {1:.4f}, loss {3:.4f}".format(i, train_accuracy, epoch, loss_score))
-
-    # model_names = [i.name for i in os.scandir(MODEL_PATH) if i.is_file() and i.name.endswith('.meta')]
-    # loop = re.findall("[0-9][0-9]*", model_names.pop())[0]
     new_saver = tf.train.import_meta_graph(MODEL_PATH + 'model_ensemble_loop_{0}.ckpt.meta'.format(loop))
-    new_saver.restore(save_path=MODEL_PATH + 'model_ensemble_loop_{0}.ckpt.meta'.format(loop), sess=sess)
+    new_saver.restore(save_path=MODEL_PATH + 'model_ensemble_loop_{0}.ckpt'.format(loop), sess=sess)
 
-    probs = sess.run(tf.nn.softmax(logits), feed_dict={x: np.array(test_set), keep_prob: 1.0})
+    probability = sess.run(tf.nn.softmax(logits), feed_dict={x: test, keep_prob: 1.0})
+    valid_accuracy, valid_probability = sess.run([metric, tf.nn.softmax(logits)], feed_dict={x: valid_x, y_: valid_y, keep_prob: 1.0})
+
+    return probability, valid_accuracy, valid_probability
 
 
 def submit(raw):
-    move_classified(test_order=test.index, pid_name=pid_name, ans=probs, mapping=mapping)
 
-    df = pd.DataFrame(data=raw, columns=mapping.values(), dtype=np.float32, index=test.index)
+    # move_classified(test_order=test.index, pid_name=pid_name, ans=probs, mapping=mapping)
+
+    df = pd.DataFrame(data=raw, columns=label.columns, dtype=np.float32, index=test_data.index)
     df.to_csv('submission.csv', encoding='utf-8', header=True, index=True)
 
 
@@ -170,43 +165,54 @@ if __name__ == '__main__':
     initializer = tf.global_variables_initializer()
     saver = tf.train.Saver()
 
-if EVAL:
+    if EVAL:
 
-    _evaluate()
+        _, valid_set = \
+            generate_training_set(data=train_data, test_size=0.95)
 
-else:
+        _, valid_y = zip(*valid_set)
 
-    kf_iterator = model_selection.StratifiedKFold(n_splits=5, shuffle=False)  # Stratified
+        probs = []
+        val_accuracies = []
+        val_probs = []
 
-    train_x = list(pid_name.keys())  # leaf id
-    train_y = list(pid_name.values())  # leaf species names
+        _, _, test = extract(INPUT_PATH + 'test.csv')
+        test_data = transform(data=test, label=None, pixels=None, standardize=True)
 
-    for train_index, valid_index in kf_iterator.split(train_x, train_y):
+        for loop in range(ENSEMBLE):
 
-        train = list()  # array of image and label in 1D array
-        valid = list()  # array of image and label in 1D array
+            prob, val_accuracy, val_prob = evaluate(test=test_data, metric=accuracy, valid_set=valid_set)
+            probs.append(prob)
+            val_accuracies.append(val_accuracy)
+            val_probs.append(val_prob)
 
-        train_id = [train_x[idx] for idx in train_index]
-        valid_id = [train_x[idx] for idx in valid_index]
+            print('Network: {0}, Validation Accuracy: {1:.4f}'.format(loop, val_accuracy))
 
-        for pid in train_x:
+        ensemble_val_prob = np.mean(np.array([val_probs[i] for i in range(ENSEMBLE)]), axis=0)
+        ensemble_val_accuracy = sum(ensemble_val_prob.argmax(axis=1) == np.array(valid_y).argmax(axis=1)) / len(valid_y)
 
-            if pid in train_id:
-                train.append(input_data[pid])
+        print('Ensemble Network of ({0}), Validation Accuracy: {1:.4f}'.format(loop + 1, ensemble_val_accuracy))
 
-            elif pid in valid_id:
-                valid.append(input_data[pid])
+        ensemble_prob = np.mean(np.array([probs[i] for i in range(ENSEMBLE)]), axis=0)
+        submit(raw=ensemble_prob)
 
-        # create batches
-        train = np.random.permutation(np.array(train))
-        batches = batch_iter(data=train, batch_size=200, num_epochs=2000, shuffle=True)
+    else:
 
-        valid = np.array(valid)
-        valid_x = np.array([i[0] for i in valid])
-        valid_y = np.array([i[1] for i in valid])
+        for loop in range(ENSEMBLE):
 
-        with sess.as_default():
-            sess.run(initializer)
-            _train(iterator=batches, optimiser=train_step, metric=accuracy, loss=loss, drop_out=.5)
+            train_set, valid_set = \
+                generate_training_set(data=train_data, test_size=0.20)
 
-        break
+            batches = batch_iter(data=train_set, batch_size=200, num_epochs=5, shuffle=True)
+
+            with sess.as_default():
+                sess.run(initializer)
+                _train(train_iterator=batches, valid_set=valid_set, optimiser=train_step,
+                       metric=accuracy, loss=loss, drop_out=.5)
+
+            if not os.path.exists(MODEL_PATH):
+                os.makedirs(MODEL_PATH)
+
+            save_path = saver.save(sess, MODEL_PATH + "model_ensemble_loop_{0}.ckpt".format(loop))
+            print("Model saved in file: {0}".format(save_path))
+
