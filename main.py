@@ -204,7 +204,7 @@ if __name__ == '__main__':
             train_set, valid_set = \
                 generate_training_set(data=train_data, test_size=0.15)
 
-            batches = batch_iter(data=train_set, batch_size=200, num_epochs=1000, shuffle=True)
+            batches = batch_iter(data=train_set, batch_size=200, num_epochs=3000, shuffle=True)
 
             with sess.as_default():
                 sess.run(initializer)
