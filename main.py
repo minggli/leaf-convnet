@@ -185,7 +185,7 @@ if __name__ == '__main__':
             'test_size': .15,
             'batch_size': 200,
             'num_epochs': 3,
-            'drop_out': [.3, .25]
+            'drop_out': [0.3, 0.25]
         },
         1: {
             'hidden_layer_1': [[5, 5, d, 64], [64]],
