@@ -24,21 +24,83 @@ train, label, data = extract(INPUT_PATH + 'train.csv', target='species')
 input_shape = (8, 8)
 m = functools.reduce(operator.mul, input_shape, 1)
 n = len(set(label))
-
 print(sys.argv[1:])
 
 EVAL = True if 'EVAL' in map(str.upper, sys.argv[1:]) else False
 ENSEMBLE = num_ensemble if 'ENSEMBLE' in map(str.upper, sys.argv[1:]) else 1
 IMAGE = True if 'IMAGE' in map(str.upper, sys.argv[1:]) else False
 
-d = 3 if not IMAGE else 4
-
-if IMAGE:
-    images_lib = {k: pic_resize(IMAGE_PATH + str(k) + '.jpg', input_shape, pad=True) for k in range(1, 1585, 1)}
-else:
-    images_lib = None
+d = 4 if IMAGE else 3
+images_lib = {k: pic_resize(IMAGE_PATH + str(k) + '.jpg', input_shape, pad=True) for k in range(1, 1585, 1)} if IMAGE else None
 
 train_data = transform(data=train, label=label, dim=d, pixels=images_lib, normalize=True)
+
+default = {
+    'hidden_layer_1': [[5, 5, d, 32], [32]],
+    'hidden_layer_2': [[3, 3, 32, 64], [64]],
+    'dense_conn_1': [[2 * 2 * 64, 2048], [2048], [-1, 2 * 2 * 64]],
+    'dense_conn_2': [[2048, 1024], [1024]],
+    'read_out': [[1024, n], [n]]
+}
+
+ensemble_params = {
+    0: {
+        'hidden_layer_1': [[5, 5, d, 32], [32]],
+        'hidden_layer_2': [[3, 3, 32, 64], [64]],
+        'dense_conn_1': [[2 * 2 * 64, 2048], [2048], [-1, 2 * 2 * 64]],
+        'dense_conn_2': [[2048, 1024], [1024]],
+        'read_out': [[1024, n], [n]],
+        'test_size': .15,
+        'batch_size': 200,
+        'num_epochs': 3000,
+        'drop_out': [0.3, 0.25]
+    },
+    1: {
+        'hidden_layer_1': [[5, 5, d, 64], [64]],
+        'hidden_layer_2': [[5, 5, 64, 128], [128]],
+        'dense_conn_1': [[2 * 2 * 128, 2048], [2048], [-1, 2 * 2 * 128]],
+        'dense_conn_2': [[2048, 1024], [1024]],
+        'read_out': [[1024, n], [n]],
+        'test_size': .20,
+        'batch_size': 100,
+        'num_epochs': 3000,
+        'drop_out': [.20, .25]
+    },
+    2: {
+        'hidden_layer_1': [[5, 5, d, 32], [32]],
+        'hidden_layer_2': [[5, 5, 32, 64], [64]],
+        'dense_conn_1': [[2 * 2 * 64, 1024], [1024], [-1, 2 * 2 * 64]],
+        'dense_conn_2': [[1024, 512], [512]],
+        'read_out': [[512, n], [n]],
+        'test_size': .25,
+        'batch_size': 250,
+        'num_epochs': 3000,
+        'drop_out': [.4, .3]
+    },
+    3: {
+        'hidden_layer_1': [[3, 3, d, 64], [64]],
+        'hidden_layer_2': [[3, 3, 64, 128], [128]],
+        'dense_conn_1': [[2 * 2 * 128, 2048], [2048], [-1, 2 * 2 * 128]],
+        'dense_conn_2': [[2048, 1024], [1024]],
+        'read_out': [[1024, n], [n]],
+        'test_size': .10,
+        'batch_size': 200,
+        'num_epochs': 3000,
+        'drop_out': [.4, .3]
+    },
+    4: {
+        'hidden_layer_1': [[3, 3, d, 32], [32]],
+        'hidden_layer_2': [[3, 3, 32, 64], [64]],
+        'dense_conn_1': [[2 * 2 * 64, 1024], [1024], [-1, 2 * 2 * 64]],
+        'dense_conn_2': [[1024, 512], [512]],
+        'read_out': [[512, n], [n]],
+        'test_size': .15,
+        'batch_size': 300,
+        'num_epochs': 3000,
+        'drop_out': [.4, .4]
+    }
+}
+
 
 # load image into tensor
 
@@ -59,6 +121,88 @@ def conv2d(x, W):
 
 def max_pool(x):
     return tf.nn.max_pool(x, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
+
+
+def graph(params):
+
+    global logits
+    global keep_prob_1
+    global keep_prob_2
+    global accuracy
+    global train_step
+    global loss
+    global sess
+    global initializer
+    global saver
+    global x
+    global y_
+
+    sess = tf.Session()
+
+    # declare placeholders
+
+    x = tf.placeholder(dtype=tf.float32, shape=[None, d, m], name='feature')
+    y_ = tf.placeholder(dtype=tf.float32, shape=[None, n], name='label')
+
+    # reshaping input
+
+    x_image = tf.reshape(x, [-1, input_shape[0], input_shape[1], d])
+
+    with tf.name_scope('hidden_layer_1'):
+        W_conv1 = weight_variable(params['hidden_layer_1'][0])
+        b_conv1 = bias_variable(params['hidden_layer_1'][1])
+
+        h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)
+        h_pool1 = max_pool(h_conv1)
+
+    with tf.name_scope('hidden_layer_2'):
+        W_conv2 = weight_variable(params['hidden_layer_2'][0])
+        b_conv2 = bias_variable(params['hidden_layer_2'][1])
+
+        h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
+        h_pool2 = max_pool(h_conv2)
+
+    with tf.name_scope('dense_conn_1'):
+        W_fc1 = weight_variable(params['dense_conn_1'][0])
+        b_fc1 = bias_variable(params['dense_conn_1'][1])
+
+        h_pool2_flat = tf.reshape(h_pool2, params['dense_conn_1'][2])
+        h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
+
+    with tf.name_scope('drop_out_1'):
+        keep_prob_1 = tf.placeholder(tf.float32)
+        h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob_1)
+
+    with tf.name_scope('dense_conn_2'):
+        W_fc2 = weight_variable(params['dense_conn_2'][0])
+        b_fc2 = bias_variable(params['dense_conn_2'][1])
+
+        h_fc2 = tf.nn.relu(tf.matmul(h_fc1_drop, W_fc2) + b_fc2)
+
+    with tf.name_scope('drop_out_2'):
+        keep_prob_2 = tf.placeholder(tf.float32)
+        h_fc2_drop = tf.nn.dropout(h_fc2, keep_prob_2)
+
+    with tf.name_scope('read_out'):
+        W_fc3 = weight_variable(params['read_out'][0])
+        b_fc3 = bias_variable(params['read_out'][1])
+
+        # logits but no softmax because softmax_cross_entropy_with_logits applies softmax inherently
+
+        logits = tf.matmul(h_fc2_drop, W_fc3) + b_fc3
+
+    # train
+    cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits, y_)
+    loss = tf.reduce_mean(cross_entropy)
+    train_step = tf.train.AdamOptimizer(learning_rate=1e-4, beta1=.9, beta2=.999).minimize(loss)
+
+    # eval
+    correct_prediction = tf.equal(tf.argmax(logits, 1), tf.argmax(y_, 1))
+    accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+
+    # miscellaneous
+    initializer = tf.global_variables_initializer()
+    saver = tf.train.Saver()
 
 
 def _train(train_iterator, valid_set, optimiser, metric, loss, drop_out=[.5, .5]):
@@ -107,148 +251,6 @@ def submit(raw):
 
 if __name__ == '__main__':
 
-    sess = tf.Session()
-
-    # declare placeholders
-
-    x = tf.placeholder(dtype=tf.float32, shape=[None, d, m], name='feature')
-    y_ = tf.placeholder(dtype=tf.float32, shape=[None, n], name='label')
-
-    # reshaping input
-
-    x_image = tf.reshape(x, [-1, input_shape[0], input_shape[1], d])
-
-    def graph(params):
-
-        global logits
-        global keep_prob_1
-        global keep_prob_2
-
-        with tf.name_scope('hidden_layer_1'):
-            W_conv1 = weight_variable(params['hidden_layer_1'][0])
-            b_conv1 = bias_variable(params['hidden_layer_1'][1])
-
-            h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)
-            h_pool1 = max_pool(h_conv1)
-
-        with tf.name_scope('hidden_layer_2'):
-            W_conv2 = weight_variable(params['hidden_layer_2'][0])
-            b_conv2 = bias_variable(params['hidden_layer_2'][1])
-
-            h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
-            h_pool2 = max_pool(h_conv2)
-
-        with tf.name_scope('dense_conn_1'):
-            W_fc1 = weight_variable(params['dense_conn_1'][0])
-            b_fc1 = bias_variable(params['dense_conn_1'][1])
-
-            h_pool2_flat = tf.reshape(h_pool2, params['dense_conn_1'][2])
-            h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
-
-        with tf.name_scope('drop_out_1'):
-            keep_prob_1 = tf.placeholder(tf.float32)
-            h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob_1)
-
-        with tf.name_scope('dense_conn_2'):
-            W_fc2 = weight_variable(params['dense_conn_2'][0])
-            b_fc2 = bias_variable(params['dense_conn_2'][1])
-
-            h_fc2 = tf.nn.relu(tf.matmul(h_fc1_drop, W_fc2) + b_fc2)
-
-        with tf.name_scope('drop_out_2'):
-            keep_prob_2 = tf.placeholder(tf.float32)
-            h_fc2_drop = tf.nn.dropout(h_fc2, keep_prob_2)
-
-        with tf.name_scope('read_out'):
-            W_fc3 = weight_variable(params['read_out'][0])
-            b_fc3 = bias_variable(params['read_out'][1])
-
-            # logits but no softmax because softmax_cross_entropy_with_logits applies softmax inherently
-
-            logits = tf.matmul(h_fc2_drop, W_fc3) + b_fc3
-
-
-    default = {
-        'hidden_layer_1': [[5, 5, d, 32], [32]],
-        'hidden_layer_2': [[3, 3, 32, 64], [64]],
-        'dense_conn_1': [[2 * 2 * 64, 2048], [2048], [-1, 2 * 2 * 64]],
-        'dense_conn_2': [[2048, 1024], [1024]],
-        'read_out': [[1024, n], [n]]
-    }
-
-    ensemble_params = {
-        0: {
-            'hidden_layer_1': [[5, 5, d, 32], [32]],
-            'hidden_layer_2': [[3, 3, 32, 64], [64]],
-            'dense_conn_1': [[2 * 2 * 64, 2048], [2048], [-1, 2 * 2 * 64]],
-            'dense_conn_2': [[2048, 1024], [1024]],
-            'read_out': [[1024, n], [n]],
-            'test_size': .15,
-            'batch_size': 200,
-            'num_epochs': 3000,
-            'drop_out': [0.3, 0.25]
-        },
-        1: {
-            'hidden_layer_1': [[5, 5, d, 64], [64]],
-            'hidden_layer_2': [[5, 5, 64, 128], [128]],
-            'dense_conn_1': [[2 * 2 * 128, 2048], [2048], [-1, 2 * 2 * 128]],
-            'dense_conn_2': [[2048, 1024], [1024]],
-            'read_out': [[1024, n], [n]],
-            'test_size': .20,
-            'batch_size': 100,
-            'num_epochs': 3000,
-            'drop_out': [.20, .25]
-        },
-        2: {
-            'hidden_layer_1': [[5, 5, d, 32], [32]],
-            'hidden_layer_2': [[5, 5, 32, 64], [64]],
-            'dense_conn_1': [[2 * 2 * 64, 1024], [1024], [-1, 2 * 2 * 64]],
-            'dense_conn_2': [[1024, 512], [512]],
-            'read_out': [[512, n], [n]],
-            'test_size': .25,
-            'batch_size': 250,
-            'num_epochs': 3000,
-            'drop_out': [.4, .3]
-        },
-        3: {
-            'hidden_layer_1': [[3, 3, d, 64], [64]],
-            'hidden_layer_2': [[3, 3, 64, 128], [128]],
-            'dense_conn_1': [[2 * 2 * 128, 2048], [2048], [-1, 2 * 2 * 128]],
-            'dense_conn_2': [[2048, 1024], [1024]],
-            'read_out': [[1024, n], [n]],
-            'test_size': .10,
-            'batch_size': 200,
-            'num_epochs': 3000,
-            'drop_out': [.4, .3]
-        },
-        4: {
-            'hidden_layer_1': [[3, 3, d, 32], [32]],
-            'hidden_layer_2': [[3, 3, 32, 64], [64]],
-            'dense_conn_1': [[2 * 2 * 64, 1024], [1024], [-1, 2 * 2 * 64]],
-            'dense_conn_2': [[1024, 512], [512]],
-            'read_out': [[512, n], [n]],
-            'test_size': .15,
-            'batch_size': 300,
-            'num_epochs': 3000,
-            'drop_out': [.4, .4]
-        }
-    }
-
-    graph(default)
-
-    # train
-    cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits, y_)
-    loss = tf.reduce_mean(cross_entropy)
-    train_step = tf.train.AdamOptimizer(learning_rate=1e-4, beta1=.9, beta2=.999).minimize(loss)
-
-    # eval
-    correct_prediction = tf.equal(tf.argmax(logits, 1), tf.argmax(y_, 1))
-    accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
-
-    # miscellaneous
-    initializer = tf.global_variables_initializer()
-    saver = tf.train.Saver()
-
     if EVAL:
 
         _, valid_set = \
@@ -265,7 +267,10 @@ if __name__ == '__main__':
 
         for loop in range(ENSEMBLE):
 
-            graph(ensemble_params[loop])
+            g = tf.Graph()
+
+            with g.as_default() as g:
+                graph(ensemble_params[loop])
 
             prob, val_accuracy, val_prob = evaluate(test=test_data, metric=accuracy, valid_set=valid_set)
             probs.append(prob)
@@ -286,18 +291,22 @@ if __name__ == '__main__':
 
         for loop in range(ENSEMBLE):
 
-            graph(ensemble_params[loop])
-
             train_set, valid_set = \
                 generate_training_set(data=train_data, test_size=ensemble_params[loop]['test_size'])
 
             batches = batch_iter(data=train_set, batch_size=ensemble_params[loop]['batch_size'],
                                  num_epochs=ensemble_params[loop]['num_epochs'], shuffle=True)
 
-            with sess.as_default():
-                sess.run(initializer)
-                _train(train_iterator=batches, valid_set=valid_set, optimiser=train_step,
-                       metric=accuracy, loss=loss, drop_out=ensemble_params[loop]['drop_out'])
+            g = tf.Graph()
+
+            with g.as_default() as g:
+
+                graph(ensemble_params[loop])
+
+                with sess.as_default():
+                    sess.run(initializer)
+                    _train(train_iterator=batches, valid_set=valid_set, optimiser=train_step,
+                           metric=accuracy, loss=loss, drop_out=ensemble_params[loop]['drop_out'])
 
             if not os.path.exists(MODEL_PATH):
                 os.makedirs(MODEL_PATH)
