@@ -221,7 +221,7 @@ if __name__ == '__main__':
             with sess.as_default():
                 sess.run(initializer)
                 _train(train_iterator=batches, valid_set=valid_set, optimiser=train_step,
-                       metric=accuracy, loss=loss, drop_out=[.5, .5])
+                       metric=accuracy, loss=loss, drop_out=[.3, .25])
 
             if not os.path.exists(MODEL_PATH):
                 os.makedirs(MODEL_PATH)
