@@ -19,7 +19,7 @@ MODEL_PATH = 'models/'
 IMAGE_PATH = 'leaf/images/'
 INPUT_PATH = 'leaf/'
 
-num_ensemble = 7
+num_ensemble = 5
 train, label, data = extract(INPUT_PATH + 'train.csv', target='species')
 input_shape = (8, 8)
 m = functools.reduce(operator.mul, input_shape, 1)
@@ -244,6 +244,8 @@ if __name__ == '__main__':
 
         for loop in range(ENSEMBLE):
 
+            cnn(ensemble_params[loop])
+
             prob, val_accuracy, val_prob = evaluate(test=test_data, metric=accuracy, valid_set=valid_set)
             probs.append(prob)
             val_accuracies.append(val_accuracy)
@@ -267,6 +269,8 @@ if __name__ == '__main__':
                 generate_training_set(data=train_data, test_size=0.10)
 
             batches = batch_iter(data=train_set, batch_size=200, num_epochs=3000, shuffle=True)
+
+            cnn(ensemble_params[loop])
 
             with sess.as_default():
                 sess.run(initializer)
