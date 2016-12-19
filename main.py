@@ -107,7 +107,7 @@ def submit(raw):
 
 if __name__ == '__main__':
 
-    sess = tf.InteractiveSession()
+    sess = tf.Session()
 
     # declare placeholders
 
@@ -118,11 +118,11 @@ if __name__ == '__main__':
 
     x_image = tf.reshape(x, [-1, input_shape[0], input_shape[1], d])
 
-    def cnn(params):
+    def graph(params):
 
-        # global logits
-        # global keep_prob_1
-        # global keep_prob_2
+        global logits
+        global keep_prob_1
+        global keep_prob_2
 
         with tf.name_scope('hidden_layer_1'):
             W_conv1 = weight_variable(params['hidden_layer_1'][0])
@@ -167,7 +167,6 @@ if __name__ == '__main__':
 
             logits = tf.matmul(h_fc2_drop, W_fc3) + b_fc3
 
-        return logits, keep_prob_1, keep_prob_2
 
     default = {
         'hidden_layer_1': [[5, 5, d, 32], [32]],
@@ -235,7 +234,7 @@ if __name__ == '__main__':
         }
     }
 
-    logits, keep_prob_1, keep_prob_2 = cnn(default)
+    graph(default)
 
     # train
     cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits, y_)
@@ -266,7 +265,7 @@ if __name__ == '__main__':
 
         for loop in range(ENSEMBLE):
 
-            cnn(ensemble_params[loop])
+            graph(ensemble_params[loop])
 
             prob, val_accuracy, val_prob = evaluate(test=test_data, metric=accuracy, valid_set=valid_set)
             probs.append(prob)
@@ -287,9 +286,7 @@ if __name__ == '__main__':
 
         for loop in range(ENSEMBLE):
 
-            cnn(ensemble_params[loop])
-
-            print(ensemble_params[loop])
+            graph(ensemble_params[loop])
 
             train_set, valid_set = \
                 generate_training_set(data=train_data, test_size=ensemble_params[loop]['test_size'])
