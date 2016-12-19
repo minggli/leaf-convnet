@@ -267,7 +267,7 @@ if __name__ == '__main__':
 
             g = tf.Graph()
 
-            with g.as_default() as g:
+            with g.as_default():
                 graph(ensemble_params[loop])
 
             prob, val_accuracy, val_prob = evaluate(test=test_data, metric=accuracy, valid_set=valid_set)
@@ -297,14 +297,13 @@ if __name__ == '__main__':
 
             g = tf.Graph()
 
-            with g.as_default() as g:
-
+            with g.as_default():
                 graph(ensemble_params[loop])
 
-                with sess.as_default():
-                    sess.run(initializer)
-                    _train(train_iterator=batches, valid_set=valid_set, optimiser=train_step,
-                           metric=accuracy, loss=loss, drop_out=ensemble_params[loop]['drop_out'])
+            with sess.as_default():
+                sess.run(initializer)
+                _train(train_iterator=batches, valid_set=valid_set, optimiser=train_step,
+                       metric=accuracy, loss=loss, drop_out=ensemble_params[loop]['drop_out'])
 
             if not os.path.exists(MODEL_PATH):
                 os.makedirs(MODEL_PATH)
