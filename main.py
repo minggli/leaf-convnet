@@ -121,37 +121,47 @@ if __name__ == '__main__':
     x_image = tf.reshape(x, [-1, input_shape[0], input_shape[1], d])
 
     with tf.name_scope('hidden_layer_1'):
-        W_conv1 = weight_variable([5, 5, d, 32])
-        b_conv1 = bias_variable([32])
+        W_conv1 = weight_variable([5, 5, d, 64])
+        b_conv1 = bias_variable([64])
 
         h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)
         h_pool1 = max_pool(h_conv1)
 
     with tf.name_scope('hidden_layer_2'):
-        W_conv2 = weight_variable([3, 3, 32, 64])
-        b_conv2 = bias_variable([64])
+        W_conv2 = weight_variable([3, 3, 64, 128])
+        b_conv2 = bias_variable([128])
 
         h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
         h_pool2 = max_pool(h_conv2)
 
     with tf.name_scope('dense_conn_1'):
-        W_fc1 = weight_variable([2 * 2 * 64, 1024])
-        b_fc1 = bias_variable([1024])
+        W_fc1 = weight_variable([2 * 2 * 128, 2048])
+        b_fc1 = bias_variable([2048])
 
-        h_pool2_flat = tf.reshape(h_pool2, [-1, 2 * 2 * 64])
+        h_pool2_flat = tf.reshape(h_pool2, [-1, 2 * 2 * 128])
         h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
 
-    with tf.name_scope('drop_out'):
+    with tf.name_scope('drop_out_1'):
         keep_prob = tf.placeholder(tf.float32)
         h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
 
-    with tf.name_scope('read_out'):
+    with tf.name_scope('dense_conn_2'):
         W_fc2 = weight_variable([1024, n])
-        b_fc2 = bias_variable([n])
+        b_fc2 = bias_variable([1024])
 
-    # logits
+        h_fc2 = tf.nn.relu(tf.matmul(h_fc1_drop, W_fc2) + b_fc2)
 
-    logits = tf.matmul(h_fc1_drop, W_fc2) + b_fc2
+    with tf.name_scope('drop_out_2'):
+        keep_prob = tf.placeholder(tf.float32)
+        h_fc2_drop = tf.nn.dropout(h_fc2, keep_prob)
+
+    with tf.name_scope('read_out'):
+        W_fc3 = weight_variable([1024, n])
+        b_fc3 = bias_variable([n])
+
+        # logits but no softmax because softmax_cross_entropy_with_logits applies softmax inherently
+
+        logits = tf.matmul(h_fc2_drop, W_fc3) + b_fc3
 
     # train
     cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits, y_)
