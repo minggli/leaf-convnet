@@ -184,7 +184,7 @@ if __name__ == '__main__':
             'read_out': [[1024, n], [n]],
             'test_size': .15,
             'batch_size': 200,
-            'num_epochs': 3000,
+            'num_epochs': 3,
             'drop_out': [.3, .25]
         },
         1: {
@@ -195,7 +195,7 @@ if __name__ == '__main__':
             'read_out': [[1024, n], [n]],
             'test_size': .20,
             'batch_size': 100,
-            'num_epochs': 3000,
+            'num_epochs': 3,
             'drop_out': [.20, .25]
         },
         2: {
@@ -206,7 +206,7 @@ if __name__ == '__main__':
             'read_out': [[512, n], [n]],
             'test_size': .25,
             'batch_size': 250,
-            'num_epochs': 3000,
+            'num_epochs': 3,
             'drop_out': [.4, .3]
         },
         3: {
@@ -217,7 +217,7 @@ if __name__ == '__main__':
             'read_out': [[1024, n], [n]],
             'test_size': .10,
             'batch_size': 200,
-            'num_epochs': 3000,
+            'num_epochs': 3,
             'drop_out': [.4, .3]
         },
         4: {
@@ -228,7 +228,7 @@ if __name__ == '__main__':
             'read_out': [[512, n], [n]],
             'test_size': .15,
             'batch_size': 300,
-            'num_epochs': 3000,
+            'num_epochs': 3,
             'drop_out': [.4, .4]
         }
     }
@@ -287,6 +287,8 @@ if __name__ == '__main__':
 
             cnn(ensemble_params[loop])
 
+            print(ensemble_params[loop])
+
             train_set, valid_set = \
                 generate_training_set(data=train_data, test_size=ensemble_params[loop]['test_size'])
 
@@ -296,7 +298,7 @@ if __name__ == '__main__':
             with sess.as_default():
                 sess.run(initializer)
                 _train(train_iterator=batches, valid_set=valid_set, optimiser=train_step,
-                       metric=accuracy, loss=loss, drop_out=ensemble_params[loop]['drop_out'])
+                       metric=accuracy, loss=loss, drop_out=[.25, .3])
 
             if not os.path.exists(MODEL_PATH):
                 os.makedirs(MODEL_PATH)
