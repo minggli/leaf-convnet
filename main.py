@@ -107,7 +107,7 @@ def submit(raw):
 
 if __name__ == '__main__':
 
-    sess = tf.Session()
+    sess = tf.InteractiveSession()
 
     # declare placeholders
 
@@ -120,9 +120,9 @@ if __name__ == '__main__':
 
     def cnn(params):
 
-        global logits
-        global keep_prob_1
-        global keep_prob_2
+        # global logits
+        # global keep_prob_1
+        # global keep_prob_2
 
         with tf.name_scope('hidden_layer_1'):
             W_conv1 = weight_variable(params['hidden_layer_1'][0])
@@ -167,6 +167,8 @@ if __name__ == '__main__':
 
             logits = tf.matmul(h_fc2_drop, W_fc3) + b_fc3
 
+        return logits, keep_prob_1, keep_prob_2
+
     default = {
         'hidden_layer_1': [[5, 5, d, 32], [32]],
         'hidden_layer_2': [[3, 3, 32, 64], [64]],
@@ -184,7 +186,7 @@ if __name__ == '__main__':
             'read_out': [[1024, n], [n]],
             'test_size': .15,
             'batch_size': 200,
-            'num_epochs': 3,
+            'num_epochs': 3000,
             'drop_out': [0.3, 0.25]
         },
         1: {
@@ -195,7 +197,7 @@ if __name__ == '__main__':
             'read_out': [[1024, n], [n]],
             'test_size': .20,
             'batch_size': 100,
-            'num_epochs': 3,
+            'num_epochs': 3000,
             'drop_out': [.20, .25]
         },
         2: {
@@ -206,7 +208,7 @@ if __name__ == '__main__':
             'read_out': [[512, n], [n]],
             'test_size': .25,
             'batch_size': 250,
-            'num_epochs': 3,
+            'num_epochs': 3000,
             'drop_out': [.4, .3]
         },
         3: {
@@ -217,7 +219,7 @@ if __name__ == '__main__':
             'read_out': [[1024, n], [n]],
             'test_size': .10,
             'batch_size': 200,
-            'num_epochs': 3,
+            'num_epochs': 3000,
             'drop_out': [.4, .3]
         },
         4: {
@@ -228,12 +230,12 @@ if __name__ == '__main__':
             'read_out': [[512, n], [n]],
             'test_size': .15,
             'batch_size': 300,
-            'num_epochs': 3,
+            'num_epochs': 3000,
             'drop_out': [.4, .4]
         }
     }
 
-    cnn(default)
+    logits, keep_prob_1, keep_prob_2 = cnn(default)
 
     # train
     cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits, y_)
