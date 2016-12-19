@@ -163,7 +163,6 @@ if __name__ == '__main__':
         b_fc3 = bias_variable([n])
 
         # logits but no softmax because softmax_cross_entropy_with_logits applies softmax inherently
-
         logits = tf.matmul(h_fc2_drop, W_fc3) + b_fc3
 
     # train
