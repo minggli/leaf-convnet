@@ -61,7 +61,7 @@ def max_pool(x):
     return tf.nn.max_pool(x, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
 
 
-def _train(train_iterator, valid_set, optimiser, metric, loss, drop_out=.5):
+def _train(train_iterator, valid_set, optimiser, metric, loss, drop_out=[.5, .5]):
 
     print('\n\n\n\n starting neural network #{}... \n\n\n\n'. format(loop))
 
@@ -74,11 +74,13 @@ def _train(train_iterator, valid_set, optimiser, metric, loss, drop_out=.5):
         x_batch = np.array(x_batch)
         y_batch = np.array(y_batch)
 
-        optimiser.run(feed_dict={x: x_batch, y_: y_batch, keep_prob: drop_out})
+        optimiser.run(feed_dict={x: x_batch, y_: y_batch, keep_prob_1: drop_out[0], keep_prob_2: drop_out[1]})
 
         if i % 5 == 0:
-            valid_accuracy, loss_score = sess.run([metric, loss], feed_dict={x: valid_x, y_: valid_y, keep_prob: 1.0})
-            print("loop {4}, epoch {2}, step {0}, validation accuracy {1:.4f}, loss {3:.4f}".format(i, valid_accuracy, epoch, loss_score, loop))
+            valid_accuracy, loss_score = \
+                sess.run([metric, loss], feed_dict={x: valid_x, y_: valid_y, keep_prob_1: 1.0, keep_prob_2: 1.0})
+            print("loop {4}, epoch {2}, step {0}, validation accuracy {1:.4f}, loss {3:.4f}".
+                  format(i, valid_accuracy, epoch, loss_score, loop))
 
 
 def evaluate(test, metric, valid_set):
@@ -88,8 +90,9 @@ def evaluate(test, metric, valid_set):
     new_saver = tf.train.import_meta_graph(MODEL_PATH + 'model_ensemble_loop_{0}.ckpt.meta'.format(loop))
     new_saver.restore(save_path=MODEL_PATH + 'model_ensemble_loop_{0}.ckpt'.format(loop), sess=sess)
 
-    probability = sess.run(tf.nn.softmax(logits), feed_dict={x: test, keep_prob: 1.0})
-    valid_accuracy, valid_probability = sess.run([metric, tf.nn.softmax(logits)], feed_dict={x: valid_x, y_: valid_y, keep_prob: 1.0})
+    probability = sess.run(tf.nn.softmax(logits), feed_dict={x: test, keep_prob_1: 1.0, keep_prob_2: 1.0})
+    valid_accuracy, valid_probability = \
+        sess.run([metric, tf.nn.softmax(logits)], feed_dict={x: valid_x, y_: valid_y, keep_prob_1: 1.0, keep_prob_2: 1.0})
 
     return probability, valid_accuracy, valid_probability
 
@@ -142,18 +145,18 @@ if __name__ == '__main__':
         h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
 
     with tf.name_scope('drop_out_1'):
-        keep_prob = tf.placeholder(tf.float32)
-        h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
+        keep_prob_1 = tf.placeholder(tf.float32)
+        h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob_1)
 
     with tf.name_scope('dense_conn_2'):
-        W_fc2 = weight_variable([1024, n])
+        W_fc2 = weight_variable([2048, 1024])
         b_fc2 = bias_variable([1024])
 
         h_fc2 = tf.nn.relu(tf.matmul(h_fc1_drop, W_fc2) + b_fc2)
 
     with tf.name_scope('drop_out_2'):
-        keep_prob = tf.placeholder(tf.float32)
-        h_fc2_drop = tf.nn.dropout(h_fc2, keep_prob)
+        keep_prob_2 = tf.placeholder(tf.float32)
+        h_fc2_drop = tf.nn.dropout(h_fc2, keep_prob_2)
 
     with tf.name_scope('read_out'):
         W_fc3 = weight_variable([1024, n])
@@ -219,10 +222,11 @@ if __name__ == '__main__':
             with sess.as_default():
                 sess.run(initializer)
                 _train(train_iterator=batches, valid_set=valid_set, optimiser=train_step,
-                       metric=accuracy, loss=loss, drop_out=.5)
+                       metric=accuracy, loss=loss, drop_out=[.5, .5])
 
             if not os.path.exists(MODEL_PATH):
                 os.makedirs(MODEL_PATH)
 
             save_path = saver.save(sess, MODEL_PATH + "model_ensemble_loop_{0}.ckpt".format(loop))
             print("Model saved in file: {0}".format(save_path))
+
