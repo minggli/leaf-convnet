@@ -19,7 +19,7 @@ MODEL_PATH = 'models/'
 IMAGE_PATH = 'leaf/images/'
 INPUT_PATH = 'leaf/'
 
-num_ensemble = 5
+num_ensemble = 7
 train, label, data = extract(INPUT_PATH + 'train.csv', target='species')
 input_shape = (8, 8)
 m = functools.reduce(operator.mul, input_shape, 1)
@@ -114,57 +114,66 @@ if __name__ == '__main__':
     x = tf.placeholder(dtype=tf.float32, shape=[None, d, m], name='feature')
     y_ = tf.placeholder(dtype=tf.float32, shape=[None, n], name='label')
 
-    # declare weights and bias unit
-
-    W = tf.Variable(tf.zeros([d, m, n]), name='weight')
-    b = tf.Variable(tf.zeros([n]), name='bias')
-
     # reshaping input
 
     x_image = tf.reshape(x, [-1, input_shape[0], input_shape[1], d])
 
-    with tf.name_scope('hidden_layer_1'):
-        W_conv1 = weight_variable([5, 5, d, 64])
-        b_conv1 = bias_variable([64])
+    def cnn(params):
 
-        h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)
-        h_pool1 = max_pool(h_conv1)
+        global logits
+        global keep_prob_1
+        global keep_prob_2
 
-    with tf.name_scope('hidden_layer_2'):
-        W_conv2 = weight_variable([3, 3, 64, 128])
-        b_conv2 = bias_variable([128])
+        with tf.name_scope('hidden_layer_1'):
+            W_conv1 = weight_variable(params['hidden_layer_1'][0])
+            b_conv1 = bias_variable(params['hidden_layer_1'][1])
 
-        h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
-        h_pool2 = max_pool(h_conv2)
+            h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)
+            h_pool1 = max_pool(h_conv1)
 
-    with tf.name_scope('dense_conn_1'):
-        W_fc1 = weight_variable([2 * 2 * 128, 2048])
-        b_fc1 = bias_variable([2048])
+        with tf.name_scope('hidden_layer_2'):
+            W_conv2 = weight_variable(params['hidden_layer_2'][0])
+            b_conv2 = bias_variable(params['hidden_layer_2'][1])
 
-        h_pool2_flat = tf.reshape(h_pool2, [-1, 2 * 2 * 128])
-        h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
+            h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
+            h_pool2 = max_pool(h_conv2)
 
-    with tf.name_scope('drop_out_1'):
-        keep_prob_1 = tf.placeholder(tf.float32)
-        h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob_1)
+        with tf.name_scope('dense_conn_1'):
+            W_fc1 = weight_variable(params['dense_conn_1'][0])
+            b_fc1 = bias_variable(params['dense_conn_1'][1])
 
-    with tf.name_scope('dense_conn_2'):
-        W_fc2 = weight_variable([2048, 1024])
-        b_fc2 = bias_variable([1024])
+            h_pool2_flat = tf.reshape(h_pool2, params['dense_conn_1'][3])
+            h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
 
-        h_fc2 = tf.nn.relu(tf.matmul(h_fc1_drop, W_fc2) + b_fc2)
+        with tf.name_scope('drop_out_1'):
+            keep_prob_1 = tf.placeholder(tf.float32)
+            h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob_1)
 
-    with tf.name_scope('drop_out_2'):
-        keep_prob_2 = tf.placeholder(tf.float32)
-        h_fc2_drop = tf.nn.dropout(h_fc2, keep_prob_2)
+        with tf.name_scope('dense_conn_2'):
+            W_fc2 = weight_variable(params['dense_conn_2'][0])
+            b_fc2 = bias_variable(params['dense_conn_2'][1])
 
-    with tf.name_scope('read_out'):
-        W_fc3 = weight_variable([1024, n])
-        b_fc3 = bias_variable([n])
+            h_fc2 = tf.nn.relu(tf.matmul(h_fc1_drop, W_fc2) + b_fc2)
 
-        # logits but no softmax because softmax_cross_entropy_with_logits applies softmax inherently
-        logits = tf.matmul(h_fc2_drop, W_fc3) + b_fc3
+        with tf.name_scope('drop_out_2'):
+            keep_prob_2 = tf.placeholder(tf.float32)
+            h_fc2_drop = tf.nn.dropout(h_fc2, keep_prob_2)
 
+        with tf.name_scope('read_out'):
+            W_fc3 = weight_variable(params['read_out'][0])
+            b_fc3 = bias_variable(params['read_out'][1])
+
+            # logits but no softmax because softmax_cross_entropy_with_logits applies softmax inherently
+
+            logits = tf.matmul(h_fc2_drop, W_fc3) + b_fc3
+
+    default = {
+        'hidden_layer_1': [[5, 5, d, 64], [64]],
+        'hidden_layer_2': [[3, 3, 64, 128], [128]],
+        'dense_conn_1': [[2 * 2 * 128, 2048], [2048], [-1, 2 * 2 * 128]],
+        'dense_conn_2': [[2048, 1024], [1024]],
+        'read_out': [[1024, n], [n]]
+    }
     # train
     cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits, y_)
     loss = tf.reduce_mean(cross_entropy)
