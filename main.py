@@ -142,7 +142,7 @@ if __name__ == '__main__':
             W_fc1 = weight_variable(params['dense_conn_1'][0])
             b_fc1 = bias_variable(params['dense_conn_1'][1])
 
-            h_pool2_flat = tf.reshape(h_pool2, params['dense_conn_1'][3])
+            h_pool2_flat = tf.reshape(h_pool2, params['dense_conn_1'][2])
             h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
 
         with tf.name_scope('drop_out_1'):
@@ -168,12 +168,15 @@ if __name__ == '__main__':
             logits = tf.matmul(h_fc2_drop, W_fc3) + b_fc3
 
     default = {
-        'hidden_layer_1': [[5, 5, d, 64], [64]],
-        'hidden_layer_2': [[3, 3, 64, 128], [128]],
-        'dense_conn_1': [[2 * 2 * 128, 2048], [2048], [-1, 2 * 2 * 128]],
+        'hidden_layer_1': [[5, 5, d, 32], [32]],
+        'hidden_layer_2': [[3, 3, 32, 64], [64]],
+        'dense_conn_1': [[2 * 2 * 64, 2048], [2048], [-1, 2 * 2 * 64]],
         'dense_conn_2': [[2048, 1024], [1024]],
         'read_out': [[1024, n], [n]]
     }
+
+    cnn(default)
+
     # train
     cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits, y_)
     loss = tf.reduce_mean(cross_entropy)
