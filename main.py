@@ -62,9 +62,9 @@ ensemble_params = {
         'dense_conn_2': [[2048, 1024], [1024]],
         'read_out': [[1024, n], [n]],
         'test_size': .20,
-        'batch_size': 100,
+        'batch_size': 200,
         'num_epochs': 3000,
-        'drop_out': [.20, .25]
+        'drop_out': [0.3, .4]
     },
     2: {
         'hidden_layer_1': [[5, 5, d, 32], [32]],
