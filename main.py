@@ -43,13 +43,14 @@ default = {
     'read_out': [[1024, n], [n]]
 }
 
-ensemble_params = {
+ensemble_hyperparams = {
+
     0: {
         'hidden_layer_1': [[5, 5, d, 32], [32]],
         'hidden_layer_2': [[5, 5, 32, 64], [64]],
         'dense_conn_1': [[2 * 2 * 64, 1024], [1024], [-1, 2 * 2 * 64]],
-        'dense_conn_2': [[1024, 512], [512]],
-        'read_out': [[512, n], [n]],
+        'dense_conn_2': [[1024, 1024], [1024]],
+        'read_out': [[1024, n], [n]],
         'test_size': .20,
         'batch_size': 200,
         'num_epochs': 2500,
@@ -61,7 +62,7 @@ ensemble_params = {
         'dense_conn_1': [[2 * 2 * 128, 2048], [2048], [-1, 2 * 2 * 128]],
         'dense_conn_2': [[2048, 1024], [1024]],
         'read_out': [[1024, n], [n]],
-        'test_size': .20,
+        'test_size': .15,
         'batch_size': 300,
         'num_epochs': 2500,
         'drop_out': [.5, .4]
@@ -92,8 +93,8 @@ ensemble_params = {
         'hidden_layer_1': [[3, 3, d, 32], [32]],
         'hidden_layer_2': [[3, 3, 32, 64], [64]],
         'dense_conn_1': [[2 * 2 * 64, 1024], [1024], [-1, 2 * 2 * 64]],
-        'dense_conn_2': [[1024, 512], [512]],
-        'read_out': [[512, n], [n]],
+        'dense_conn_2': [[1024, 1024], [1024]],
+        'read_out': [[1024, n], [n]],
         'test_size': .15,
         'batch_size': 300,
         'num_epochs': 2500,
@@ -103,8 +104,8 @@ ensemble_params = {
         'hidden_layer_1': [[3, 3, d, 64], [64]],
         'hidden_layer_2': [[3, 3, 64, 128], [128]],
         'dense_conn_1': [[2 * 2 * 128, 1024], [1024], [-1, 2 * 2 * 128]],
-        'dense_conn_2': [[1024, 512], [512]],
-        'read_out': [[512, n], [n]],
+        'dense_conn_2': [[1024, 1024], [1024]],
+        'read_out': [[1024, n], [n]],
         'test_size': .15,
         'batch_size': 300,
         'num_epochs': 2500,
@@ -291,7 +292,7 @@ if __name__ == '__main__':
             g = tf.Graph()
 
             with g.as_default():
-                graph(ensemble_params[loop])
+                graph(ensemble_hyperparams[loop])
 
                 prob, val_accuracy, val_prob = evaluate(test=test_data, metric=accuracy, valid_set=valid_set)
                 probs.append(prob)
@@ -313,20 +314,20 @@ if __name__ == '__main__':
         for loop in range(ENSEMBLE):
 
             train_set, valid_set = \
-                generate_training_set(data=train_data, test_size=ensemble_params[loop]['test_size'])
+                generate_training_set(data=train_data, test_size=ensemble_hyperparams[loop]['test_size'])
 
-            batches = batch_iter(data=train_set, batch_size=ensemble_params[loop]['batch_size'],
-                                 num_epochs=ensemble_params[loop]['num_epochs'], shuffle=True)
+            batches = batch_iter(data=train_set, batch_size=ensemble_hyperparams[loop]['batch_size'],
+                                 num_epochs=ensemble_hyperparams[loop]['num_epochs'], shuffle=True)
 
             g = tf.Graph()
 
             with g.as_default():
-                graph(ensemble_params[loop])
+                graph(ensemble_hyperparams[loop])
 
                 with sess.as_default():
                     sess.run(initializer)
                     optimise(train_iterator=batches, valid_set=valid_set, optimiser=train_step,
-                           metric=accuracy, loss=loss, drop_out=ensemble_params[loop]['drop_out'])
+                           metric=accuracy, loss=loss, drop_out=ensemble_hyperparams[loop]['drop_out'])
 
             if not os.path.exists(MODEL_PATH):
                 os.makedirs(MODEL_PATH)
