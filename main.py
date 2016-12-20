@@ -52,7 +52,7 @@ ensemble_params = {
         'read_out': [[512, n], [n]],
         'test_size': .20,
         'batch_size': 200,
-        'num_epochs': 25,
+        'num_epochs': 2500,
         'drop_out': [.4, .5]
     },
     1: {
@@ -63,7 +63,7 @@ ensemble_params = {
         'read_out': [[1024, n], [n]],
         'test_size': .20,
         'batch_size': 300,
-        'num_epochs': 25,
+        'num_epochs': 2500,
         'drop_out': [.3, .25]
     },
     2: {
@@ -74,7 +74,7 @@ ensemble_params = {
         'read_out': [[1024, n], [n]],
         'test_size': .20,
         'batch_size': 200,
-        'num_epochs': 25,
+        'num_epochs': 2500,
         'drop_out': [.4, .5]
     },
     3: {
@@ -85,7 +85,7 @@ ensemble_params = {
         'read_out': [[1024, n], [n]],
         'test_size': .10,
         'batch_size': 200,
-        'num_epochs': 25,
+        'num_epochs': 2500,
         'drop_out': [.3, .3]
     },
     4: {
@@ -96,7 +96,7 @@ ensemble_params = {
         'read_out': [[512, n], [n]],
         'test_size': .15,
         'batch_size': 300,
-        'num_epochs': 25,
+        'num_epochs': 2500,
         'drop_out': [.3, .3]
     },
     5: {
@@ -107,7 +107,7 @@ ensemble_params = {
         'read_out': [[512, n], [n]],
         'test_size': .15,
         'batch_size': 300,
-        'num_epochs': 25,
+        'num_epochs': 2500,
         'drop_out': [.4, .4]
     },
     6: {
@@ -118,7 +118,7 @@ ensemble_params = {
         'read_out': [[1024, n], [n]],
         'test_size': .20,
         'batch_size': 300,
-        'num_epochs': 25,
+        'num_epochs': 2500,
         'drop_out': [.4, .5]
     }
 }
