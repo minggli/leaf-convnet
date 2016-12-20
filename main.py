@@ -262,6 +262,8 @@ def evaluate(test, metric, valid_set):
 
 def submit(raw):
 
+    delete_folders()
+
     move_classified(test_data=raw, train_data=data, columns=label.columns, index=test.index, path=IMAGE_PATH)
 
     df = pd.DataFrame(data=raw, columns=label.columns, dtype=np.float32, index=test.index)
