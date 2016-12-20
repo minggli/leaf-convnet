@@ -54,7 +54,7 @@ ensemble_hyperparams = {
         'test_size': .10,
         'batch_size': 200,
         'num_epochs': 5000,
-        'drop_out': [.3, .3]
+        'drop_out': [.5, .5]
     },
     1: {
         'hidden_layer_1': [[5, 5, d, 64], [64]],
@@ -65,7 +65,7 @@ ensemble_hyperparams = {
         'test_size': .10,
         'batch_size': 300,
         'num_epochs': 5000,
-        'drop_out': [.3, .3]
+        'drop_out': [.5, .5]
     },
     2: {
         'hidden_layer_1': [[5, 5, d, 32], [32]],
@@ -76,7 +76,7 @@ ensemble_hyperparams = {
         'test_size': .15,
         'batch_size': 200,
         'num_epochs': 5000,
-        'drop_out': [.3, .3]
+        'drop_out': [.5, .5]
     },
     3: {
         'hidden_layer_1': [[5, 5, d, 64], [64]],
@@ -87,7 +87,7 @@ ensemble_hyperparams = {
         'test_size': .10,
         'batch_size': 250,
         'num_epochs': 5000,
-        'drop_out': [.3, .3]
+        'drop_out': [.5, .5]
     },
     4: {
         'hidden_layer_1': [[5, 5, d, 32], [32]],
