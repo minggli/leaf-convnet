@@ -49,12 +49,12 @@ ensemble_hyperparams = {
         'hidden_layer_1': [[5, 5, d, 32], [32]],
         'hidden_layer_2': [[5, 5, 32, 64], [64]],
         'dense_conn_1': [[2 * 2 * 64, 1024], [1024], [-1, 2 * 2 * 64]],
-        'dense_conn_2': [[1024, 1024], [1024]],
-        'read_out': [[1024, n], [n]],
-        'test_size': .15,
+        'dense_conn_2': [[1024, 512], [512]],
+        'read_out': [[512, n], [n]],
+        'test_size': .10,
         'batch_size': 200,
-        'num_epochs': 2500,
-        'drop_out': [.5, .5]
+        'num_epochs': 5000,
+        'drop_out': [.3, .3]
     },
     1: {
         'hidden_layer_1': [[5, 5, d, 64], [64]],
@@ -64,8 +64,8 @@ ensemble_hyperparams = {
         'read_out': [[1024, n], [n]],
         'test_size': .10,
         'batch_size': 300,
-        'num_epochs': 2500,
-        'drop_out': [.5, .5]
+        'num_epochs': 5000,
+        'drop_out': [.3, .3]
     },
     2: {
         'hidden_layer_1': [[5, 5, d, 32], [32]],
@@ -75,8 +75,8 @@ ensemble_hyperparams = {
         'read_out': [[1024, n], [n]],
         'test_size': .15,
         'batch_size': 200,
-        'num_epochs': 2500,
-        'drop_out': [.5, .5]
+        'num_epochs': 5000,
+        'drop_out': [.3, .3]
     },
     3: {
         'hidden_layer_1': [[5, 5, d, 64], [64]],
@@ -86,29 +86,29 @@ ensemble_hyperparams = {
         'read_out': [[1024, n], [n]],
         'test_size': .10,
         'batch_size': 250,
-        'num_epochs': 2500,
-        'drop_out': [.5, .5]
+        'num_epochs': 5000,
+        'drop_out': [.3, .3]
     },
     4: {
         'hidden_layer_1': [[5, 5, d, 32], [32]],
         'hidden_layer_2': [[5, 5, 32, 64], [64]],
         'dense_conn_1': [[2 * 2 * 64, 1024], [1024], [-1, 2 * 2 * 64]],
-        'dense_conn_2': [[1024, 1024], [1024]],
-        'read_out': [[1024, n], [n]],
-        'test_size': .15,
+        'dense_conn_2': [[1024, 512], [512]],
+        'read_out': [[512, n], [n]],
+        'test_size': .10,
         'batch_size': 300,
-        'num_epochs': 2500,
+        'num_epochs': 5000,
         'drop_out': [.5, .5]
     },
     5: {
         'hidden_layer_1': [[5, 5, d, 64], [64]],
         'hidden_layer_2': [[5, 5, 64, 128], [128]],
         'dense_conn_1': [[2 * 2 * 128, 1024], [1024], [-1, 2 * 2 * 128]],
-        'dense_conn_2': [[1024, 1024], [1024]],
-        'read_out': [[1024, n], [n]],
+        'dense_conn_2': [[1024, 512], [512]],
+        'read_out': [[512, n], [n]],
         'test_size': .15,
         'batch_size': 300,
-        'num_epochs': 2500,
+        'num_epochs': 5000,
         'drop_out': [.5, .5]
     },
     6: {
@@ -117,9 +117,9 @@ ensemble_hyperparams = {
         'dense_conn_1': [[2 * 2 * 128, 2048], [2048], [-1, 2 * 2 * 128]],
         'dense_conn_2': [[2048, 1024], [1024]],
         'read_out': [[1024, n], [n]],
-        'test_size': .15,
+        'test_size': .10,
         'batch_size': 300,
-        'num_epochs': 2500,
+        'num_epochs': 5000,
         'drop_out': [.5, .5]
     }
 }
@@ -214,7 +214,7 @@ def graph(hyperparams):
     # train
     cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits, y_)
     loss = tf.reduce_mean(cross_entropy)
-    train_step = tf.train.AdamOptimizer(learning_rate=1e-4, beta1=.9, beta2=.999).minimize(loss)
+    train_step = tf.train.AdamOptimizer(learning_rate=1e-4, beta1=.9, beta2=.99).minimize(loss)
 
     # eval
     correct_prediction = tf.equal(tf.argmax(logits, 1), tf.argmax(y_, 1))
