@@ -52,7 +52,7 @@ ensemble_params = {
         'read_out': [[512, n], [n]],
         'test_size': .20,
         'batch_size': 200,
-        'num_epochs': 2500,
+        'num_epochs': 25,
         'drop_out': [.4, .5]
     },
     1: {
@@ -63,7 +63,7 @@ ensemble_params = {
         'read_out': [[1024, n], [n]],
         'test_size': .20,
         'batch_size': 300,
-        'num_epochs': 2500,
+        'num_epochs': 25,
         'drop_out': [.3, .25]
     },
     2: {
@@ -74,7 +74,7 @@ ensemble_params = {
         'read_out': [[1024, n], [n]],
         'test_size': .20,
         'batch_size': 200,
-        'num_epochs': 2500,
+        'num_epochs': 25,
         'drop_out': [.4, .5]
     },
     3: {
@@ -85,7 +85,7 @@ ensemble_params = {
         'read_out': [[1024, n], [n]],
         'test_size': .10,
         'batch_size': 200,
-        'num_epochs': 2500,
+        'num_epochs': 25,
         'drop_out': [.3, .3]
     },
     4: {
@@ -96,7 +96,7 @@ ensemble_params = {
         'read_out': [[512, n], [n]],
         'test_size': .15,
         'batch_size': 300,
-        'num_epochs': 2500,
+        'num_epochs': 25,
         'drop_out': [.3, .3]
     },
     5: {
@@ -107,22 +107,21 @@ ensemble_params = {
         'read_out': [[512, n], [n]],
         'test_size': .15,
         'batch_size': 300,
-        'num_epochs': 2500,
+        'num_epochs': 25,
         'drop_out': [.4, .4]
     },
     6: {
         'hidden_layer_1': [[3, 3, d, 64], [64]],
         'hidden_layer_2': [[3, 3, 64, 128], [128]],
-        'dense_conn_1': [[2 * 2 * 128, 2048], [2048], [-1, 2 * 2 * 64]],
+        'dense_conn_1': [[2 * 2 * 128, 2048], [2048], [-1, 2 * 2 * 128]],
         'dense_conn_2': [[2048, 1024], [1024]],
         'read_out': [[1024, n], [n]],
         'test_size': .20,
         'batch_size': 300,
-        'num_epochs': 2500,
+        'num_epochs': 25,
         'drop_out': [.4, .5]
     }
 }
-
 
 # load image into tensor
 
