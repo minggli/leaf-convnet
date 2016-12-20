@@ -144,7 +144,7 @@ def max_pool(x):
     return tf.nn.max_pool(x, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
 
 
-def graph(params):
+def graph(hyperparams):
 
     global logits
     global keep_prob_1
@@ -170,24 +170,24 @@ def graph(params):
     x_image = tf.reshape(x, [-1, input_shape[0], input_shape[1], d])
 
     with tf.name_scope('hidden_layer_1'):
-        W_conv1 = weight_variable(params['hidden_layer_1'][0])
-        b_conv1 = bias_variable(params['hidden_layer_1'][1])
+        W_conv1 = weight_variable(hyperparams['hidden_layer_1'][0])
+        b_conv1 = bias_variable(hyperparams['hidden_layer_1'][1])
 
         h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)
         h_pool1 = max_pool(h_conv1)
 
     with tf.name_scope('hidden_layer_2'):
-        W_conv2 = weight_variable(params['hidden_layer_2'][0])
-        b_conv2 = bias_variable(params['hidden_layer_2'][1])
+        W_conv2 = weight_variable(hyperparams['hidden_layer_2'][0])
+        b_conv2 = bias_variable(hyperparams['hidden_layer_2'][1])
 
         h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
         h_pool2 = max_pool(h_conv2)
 
     with tf.name_scope('dense_conn_1'):
-        W_fc1 = weight_variable(params['dense_conn_1'][0])
-        b_fc1 = bias_variable(params['dense_conn_1'][1])
+        W_fc1 = weight_variable(hyperparams['dense_conn_1'][0])
+        b_fc1 = bias_variable(hyperparams['dense_conn_1'][1])
 
-        h_pool2_flat = tf.reshape(h_pool2, params['dense_conn_1'][2])
+        h_pool2_flat = tf.reshape(h_pool2, hyperparams['dense_conn_1'][2])
         h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
 
     with tf.name_scope('drop_out_1'):
@@ -195,8 +195,8 @@ def graph(params):
         h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob_1)
 
     with tf.name_scope('dense_conn_2'):
-        W_fc2 = weight_variable(params['dense_conn_2'][0])
-        b_fc2 = bias_variable(params['dense_conn_2'][1])
+        W_fc2 = weight_variable(hyperparams['dense_conn_2'][0])
+        b_fc2 = bias_variable(hyperparams['dense_conn_2'][1])
 
         h_fc2 = tf.nn.relu(tf.matmul(h_fc1_drop, W_fc2) + b_fc2)
 
@@ -205,8 +205,8 @@ def graph(params):
         h_fc2_drop = tf.nn.dropout(h_fc2, keep_prob_2)
 
     with tf.name_scope('read_out'):
-        W_fc3 = weight_variable(params['read_out'][0])
-        b_fc3 = bias_variable(params['read_out'][1])
+        W_fc3 = weight_variable(hyperparams['read_out'][0])
+        b_fc3 = bias_variable(hyperparams['read_out'][1])
 
         logits = tf.matmul(h_fc2_drop, W_fc3) + b_fc3
 
@@ -273,7 +273,7 @@ if __name__ == '__main__':
     if EVAL:
 
         _, valid_set = \
-            generate_training_set(data=train_data, test_size=0.90)
+            generate_training_set(data=train_data, test_size=0.80)
 
         _, valid_y = zip(*valid_set)
 
