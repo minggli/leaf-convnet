@@ -227,7 +227,10 @@ def graph(hyperparams):
 
 def optimise(train_iterator, valid_set, optimiser, metric, loss, drop_out=[.5, .5]):
 
-    print('\n\n\n\n starting neural network #{}... \n\n\n\n'. format(loop))
+    print('\n\n\n\n starting neural network #{}... \n'. format(loop))
+
+    for i in ensemble_hyperparams[loop]:
+        print('{0}:{1}'.format(i, ensemble_hyperparams[loop][i]))
 
     valid_x, valid_y = zip(*valid_set)
 
