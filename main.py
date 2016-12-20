@@ -53,7 +53,7 @@ ensemble_params = {
         'test_size': .20,
         'batch_size': 200,
         'num_epochs': 2500,
-        'drop_out': [.4, .5]
+        'drop_out': [.4, .3]
     },
     1: {
         'hidden_layer_1': [[5, 5, d, 64], [64]],
@@ -64,7 +64,7 @@ ensemble_params = {
         'test_size': .20,
         'batch_size': 300,
         'num_epochs': 2500,
-        'drop_out': [.3, .25]
+        'drop_out': [.5, .4]
     },
     2: {
         'hidden_layer_1': [[5, 5, d, 32], [32]],
@@ -75,7 +75,7 @@ ensemble_params = {
         'test_size': .20,
         'batch_size': 200,
         'num_epochs': 2500,
-        'drop_out': [.4, .5]
+        'drop_out': [.4, .4]
     },
     3: {
         'hidden_layer_1': [[3, 3, d, 64], [64]],
@@ -83,10 +83,10 @@ ensemble_params = {
         'dense_conn_1': [[2 * 2 * 128, 2048], [2048], [-1, 2 * 2 * 128]],
         'dense_conn_2': [[2048, 1024], [1024]],
         'read_out': [[1024, n], [n]],
-        'test_size': .10,
+        'test_size': .15,
         'batch_size': 200,
         'num_epochs': 2500,
-        'drop_out': [.3, .3]
+        'drop_out': [.4, .3]
     },
     4: {
         'hidden_layer_1': [[3, 3, d, 32], [32]],
@@ -97,7 +97,7 @@ ensemble_params = {
         'test_size': .15,
         'batch_size': 300,
         'num_epochs': 2500,
-        'drop_out': [.3, .3]
+        'drop_out': [.5, .4]
     },
     5: {
         'hidden_layer_1': [[3, 3, d, 64], [64]],
@@ -108,7 +108,7 @@ ensemble_params = {
         'test_size': .15,
         'batch_size': 300,
         'num_epochs': 2500,
-        'drop_out': [.4, .4]
+        'drop_out': [.5, .4]
     },
     6: {
         'hidden_layer_1': [[3, 3, d, 64], [64]],
@@ -119,7 +119,7 @@ ensemble_params = {
         'test_size': .20,
         'batch_size': 300,
         'num_epochs': 2500,
-        'drop_out': [.4, .5]
+        'drop_out': [.4, .3]
     }
 }
 
