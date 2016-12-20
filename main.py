@@ -19,7 +19,7 @@ MODEL_PATH = 'models/'
 IMAGE_PATH = 'leaf/images/'
 INPUT_PATH = 'leaf/'
 
-num_ensemble = 5
+num_ensemble = 7
 train, label, data = extract(INPUT_PATH + 'train.csv', target='species')
 input_shape = (8, 8)
 m = functools.reduce(operator.mul, input_shape, 1)
@@ -37,8 +37,8 @@ train_data = transform(data=train, label=label, dim=d, pixels=images_lib, normal
 
 default = {
     'hidden_layer_1': [[5, 5, d, 32], [32]],
-    'hidden_layer_2': [[3, 3, 32, 64], [64]],
-    'dense_conn_1': [[2 * 2 * 64, 2048], [2048], [-1, 2 * 2 * 64]],
+    'hidden_layer_2': [[5, 5, 32, 64], [64]],
+    'dense_conn_1': [[2 * 2 * 64, 1024], [1024], [-1, 2 * 2 * 64]],
     'dense_conn_2': [[2048, 1024], [1024]],
     'read_out': [[1024, n], [n]]
 }
@@ -46,14 +46,14 @@ default = {
 ensemble_params = {
     0: {
         'hidden_layer_1': [[5, 5, d, 32], [32]],
-        'hidden_layer_2': [[3, 3, 32, 64], [64]],
-        'dense_conn_1': [[2 * 2 * 64, 2048], [2048], [-1, 2 * 2 * 64]],
-        'dense_conn_2': [[2048, 1024], [1024]],
-        'read_out': [[1024, n], [n]],
-        'test_size': .15,
+        'hidden_layer_2': [[5, 5, 32, 64], [64]],
+        'dense_conn_1': [[2 * 2 * 64, 1024], [1024], [-1, 2 * 2 * 64]],
+        'dense_conn_2': [[1024, 512], [512]],
+        'read_out': [[512, n], [n]],
+        'test_size': .20,
         'batch_size': 200,
-        'num_epochs': 3000,
-        'drop_out': [0.3, 0.25]
+        'num_epochs': 2500,
+        'drop_out': [.4, .5]
     },
     1: {
         'hidden_layer_1': [[5, 5, d, 64], [64]],
@@ -62,20 +62,20 @@ ensemble_params = {
         'dense_conn_2': [[2048, 1024], [1024]],
         'read_out': [[1024, n], [n]],
         'test_size': .20,
-        'batch_size': 200,
-        'num_epochs': 3000,
-        'drop_out': [0.3, .4]
+        'batch_size': 300,
+        'num_epochs': 2500,
+        'drop_out': [.3, .25]
     },
     2: {
         'hidden_layer_1': [[5, 5, d, 32], [32]],
-        'hidden_layer_2': [[5, 5, 32, 64], [64]],
-        'dense_conn_1': [[2 * 2 * 64, 1024], [1024], [-1, 2 * 2 * 64]],
-        'dense_conn_2': [[1024, 512], [512]],
-        'read_out': [[512, n], [n]],
-        'test_size': .25,
-        'batch_size': 250,
-        'num_epochs': 3000,
-        'drop_out': [.4, .3]
+        'hidden_layer_2': [[3, 3, 32, 64], [64]],
+        'dense_conn_1': [[2 * 2 * 64, 2048], [2048], [-1, 2 * 2 * 64]],
+        'dense_conn_2': [[2048, 1024], [1024]],
+        'read_out': [[1024, n], [n]],
+        'test_size': .20,
+        'batch_size': 200,
+        'num_epochs': 2500,
+        'drop_out': [.4, .5]
     },
     3: {
         'hidden_layer_1': [[3, 3, d, 64], [64]],
@@ -85,8 +85,8 @@ ensemble_params = {
         'read_out': [[1024, n], [n]],
         'test_size': .10,
         'batch_size': 200,
-        'num_epochs': 3000,
-        'drop_out': [.4, .3]
+        'num_epochs': 2500,
+        'drop_out': [.3, .3]
     },
     4: {
         'hidden_layer_1': [[3, 3, d, 32], [32]],
@@ -96,8 +96,30 @@ ensemble_params = {
         'read_out': [[512, n], [n]],
         'test_size': .15,
         'batch_size': 300,
-        'num_epochs': 3000,
+        'num_epochs': 2500,
+        'drop_out': [.3, .3]
+    },
+    5: {
+        'hidden_layer_1': [[3, 3, d, 32], [32]],
+        'hidden_layer_2': [[3, 3, 32, 64], [64]],
+        'dense_conn_1': [[2 * 2 * 64, 1024], [1024], [-1, 2 * 2 * 64]],
+        'dense_conn_2': [[1024, 512], [512]],
+        'read_out': [[512, n], [n]],
+        'test_size': .15,
+        'batch_size': 300,
+        'num_epochs': 2500,
         'drop_out': [.4, .4]
+    },
+    6: {
+        'hidden_layer_1': [[3, 3, d, 64], [64]],
+        'hidden_layer_2': [[3, 3, 64, 128], [128]],
+        'dense_conn_1': [[2 * 2 * 128, 2048], [2048], [-1, 2 * 2 * 64]],
+        'dense_conn_2': [[2048, 1024], [1024]],
+        'read_out': [[1024, n], [n]],
+        'test_size': .20,
+        'batch_size': 300,
+        'num_epochs': 2500,
+        'drop_out': [.4, .5]
     }
 }
 
@@ -270,10 +292,10 @@ if __name__ == '__main__':
             with g.as_default():
                 graph(ensemble_params[loop])
 
-            prob, val_accuracy, val_prob = evaluate(test=test_data, metric=accuracy, valid_set=valid_set)
-            probs.append(prob)
-            val_accuracies.append(val_accuracy)
-            val_probs.append(val_prob)
+                prob, val_accuracy, val_prob = evaluate(test=test_data, metric=accuracy, valid_set=valid_set)
+                probs.append(prob)
+                val_accuracies.append(val_accuracy)
+                val_probs.append(val_prob)
 
             print('Network: {0}, Validation Accuracy: {1:.4f}'.format(loop, val_accuracy))
 
@@ -300,10 +322,10 @@ if __name__ == '__main__':
             with g.as_default():
                 graph(ensemble_params[loop])
 
-            with sess.as_default():
-                sess.run(initializer)
-                _train(train_iterator=batches, valid_set=valid_set, optimiser=train_step,
-                       metric=accuracy, loss=loss, drop_out=ensemble_params[loop]['drop_out'])
+                with sess.as_default():
+                    sess.run(initializer)
+                    _train(train_iterator=batches, valid_set=valid_set, optimiser=train_step,
+                           metric=accuracy, loss=loss, drop_out=ensemble_params[loop]['drop_out'])
 
             if not os.path.exists(MODEL_PATH):
                 os.makedirs(MODEL_PATH)
