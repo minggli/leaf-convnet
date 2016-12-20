@@ -224,7 +224,7 @@ def graph(hyperparams):
     saver = tf.train.Saver()
 
 
-def _train(train_iterator, valid_set, optimiser, metric, loss, drop_out=[.5, .5]):
+def optimise(train_iterator, valid_set, optimiser, metric, loss, drop_out=[.5, .5]):
 
     print('\n\n\n\n starting neural network #{}... \n\n\n\n'. format(loop))
 
@@ -323,7 +323,7 @@ if __name__ == '__main__':
 
                 with sess.as_default():
                     sess.run(initializer)
-                    _train(train_iterator=batches, valid_set=valid_set, optimiser=train_step,
+                    optimise(train_iterator=batches, valid_set=valid_set, optimiser=train_step,
                            metric=accuracy, loss=loss, drop_out=ensemble_params[loop]['drop_out'])
 
             if not os.path.exists(MODEL_PATH):
