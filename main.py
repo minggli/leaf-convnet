@@ -79,15 +79,15 @@ ensemble_hyperparams = {
         'drop_out': [.4, .4]
     },
     3: {
-        'hidden_layer_1': [[3, 3, d, 64], [64]],
-        'hidden_layer_2': [[3, 3, 64, 128], [128]],
+        'hidden_layer_1': [[5, 5, d, 64], [64]],
+        'hidden_layer_2': [[5, 5, 64, 128], [128]],
         'dense_conn_1': [[2 * 2 * 128, 2048], [2048], [-1, 2 * 2 * 128]],
         'dense_conn_2': [[2048, 1024], [1024]],
         'read_out': [[1024, n], [n]],
         'test_size': .15,
-        'batch_size': 200,
+        'batch_size': 250,
         'num_epochs': 2500,
-        'drop_out': [.4, .3]
+        'drop_out': [.5, .4]
     },
     4: {
         'hidden_layer_1': [[3, 3, d, 32], [32]],
