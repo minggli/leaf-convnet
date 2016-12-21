@@ -21,7 +21,7 @@ INPUT_PATH = 'leaf/'
 
 num_ensemble = 5
 train, label, data = extract(INPUT_PATH + 'train.csv', target='species')
-input_shape = (96, 96)
+input_shape = (48, 48)
 m = functools.reduce(operator.mul, input_shape, 1)
 n = len(set(label))
 
@@ -57,7 +57,7 @@ ensemble_hyperparams = {
     0: {
         'hidden_layer_1': [[5, 5, d, 8], [8]],
         'hidden_layer_2': [[5, 5, 8, 32], [32]],
-        'dense_conn_1': [[6 * 6 * 32, 512], [512], [-1, 6 * 6 * 32]],
+        'dense_conn_1': [[12 * 12 * 32, 512], [512], [-1, 12 * 12 * 32]],
         'dense_conn_2': [[512, 99], [99]],
         'read_out': [[99, n], [n]],
         'test_size': .15,
@@ -68,7 +68,7 @@ ensemble_hyperparams = {
     1: {
         'hidden_layer_1': [[5, 5, d, 8], [8]],
         'hidden_layer_2': [[5, 5, 8, 32], [32]],
-        'dense_conn_1': [[6 * 6 * 32, 1024], [1024], [-1, 6 * 6 * 32]],
+        'dense_conn_1': [[12 * 12 * 32, 1024], [1024], [-1, 12 * 12 * 32]],
         'dense_conn_2': [[1024, 512], [512]],
         'read_out': [[512, n], [n]],
         'test_size': .10,
@@ -79,7 +79,7 @@ ensemble_hyperparams = {
     2: {
         'hidden_layer_1': [[5, 5, d, 16], [16]],
         'hidden_layer_2': [[5, 5, 16, 64], [64]],
-        'dense_conn_1': [[6 * 6 * 64, 1024], [1024], [-1, 6 * 6 * 64]],
+        'dense_conn_1': [[12 * 12 * 64, 1024], [1024], [-1, 12 * 12 * 64]],
         'dense_conn_2': [[1024, 1024], [1024]],
         'read_out': [[1024, n], [n]],
         'test_size': .15,
@@ -90,7 +90,7 @@ ensemble_hyperparams = {
     3: {
         'hidden_layer_1': [[5, 5, d, 64], [64]],
         'hidden_layer_2': [[5, 5, 64, 128], [128]],
-        'dense_conn_1': [[6 * 6 * 128, 1024], [1024], [-1, 6 * 6 * 128]],
+        'dense_conn_1': [[12 * 12 * 128, 1024], [1024], [-1, 12 * 12 * 128]],
         'dense_conn_2': [[1024, 512], [512]],
         'read_out': [[512, n], [n]],
         'test_size': .15,
@@ -101,7 +101,7 @@ ensemble_hyperparams = {
     4: {
         'hidden_layer_1': [[5, 5, d, 64], [64]],
         'hidden_layer_2': [[5, 5, 64, 128], [128]],
-        'dense_conn_1': [[6 * 6 * 128, 2048], [2048], [-1, 6 * 6 * 128]],
+        'dense_conn_1': [[12 * 12 * 128, 2048], [2048], [-1, 12 * 12 * 128]],
         'dense_conn_2': [[2048, 1024], [1024]],
         'read_out': [[1024, n], [n]],
         'test_size': .15,
