@@ -71,7 +71,7 @@ ensemble_hyperparams = {
         'dense_conn_1': [[24 * 24 * 32, 1024], [1024], [-1, 24 * 24 * 32]],
         'dense_conn_2': [[1024, 512], [512]],
         'read_out': [[512, n], [n]],
-        'test_size': .15,
+        'test_size': .10,
         'batch_size': 300,
         'num_epochs': 3000,
         'drop_out': [.5, .5]
