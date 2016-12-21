@@ -17,7 +17,7 @@ def extract(file, target=None):
     return train, label, data
 
 
-def transform(data, label, dim, pixels=None, normalize=True):
+def transform(data, label, dim, input_shape, pixels=None, normalize=True):
     """standard scaling and turning data into 3-dim array for either train or test"""
 
     if pixels is not None:

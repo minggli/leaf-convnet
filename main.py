@@ -21,7 +21,7 @@ INPUT_PATH = 'leaf/'
 
 num_ensemble = 7
 train, label, data = extract(INPUT_PATH + 'train.csv', target='species')
-input_shape = (8, 8)
+input_shape = (96, 96)
 m = functools.reduce(operator.mul, input_shape, 1)
 n = len(set(label))
 
@@ -42,7 +42,7 @@ else:
 images_lib = {k: pic_resize(IMAGE_PATH + str(k) + '.jpg', input_shape, pad=True) for k in range(1, 1585, 1)} \
     if IMAGE or IMAGEONLY else None
 
-train_data = transform(data=train, label=label, dim=d, pixels=images_lib, normalize=True)
+train_data = transform(data=train, label=label, dim=d, input_shape=input_shape, pixels=images_lib, normalize=True)
 
 default = {
     'hidden_layer_1': [[5, 5, d, 32], [32]],
@@ -297,7 +297,7 @@ if __name__ == '__main__':
         val_probs = []
 
         _, _, test = extract(INPUT_PATH + 'test.csv')
-        test_data = transform(data=test, label=None, dim=d, pixels=images_lib, normalize=True)
+        test_data = transform(data=test, label=None, dim=d, input_shape=input_shape, pixels=images_lib, normalize=True)
 
         for loop in range(ENSEMBLE):
 
