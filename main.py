@@ -51,10 +51,10 @@ ensemble_hyperparams = {
         'dense_conn_1': [[2 * 2 * 64, 1024], [1024], [-1, 2 * 2 * 64]],
         'dense_conn_2': [[1024, 512], [512]],
         'read_out': [[512, n], [n]],
-        'test_size': .10,
+        'test_size': .15,
         'batch_size': 200,
-        'num_epochs': 5000,
-        'drop_out': [.5, .5]
+        'num_epochs': 3000,
+        'drop_out': [.3, .25]
     },
     1: {
         'hidden_layer_1': [[5, 5, d, 64], [64]],
@@ -62,9 +62,9 @@ ensemble_hyperparams = {
         'dense_conn_1': [[2 * 2 * 128, 2048], [2048], [-1, 2 * 2 * 128]],
         'dense_conn_2': [[2048, 1024], [1024]],
         'read_out': [[1024, n], [n]],
-        'test_size': .10,
+        'test_size': .15,
         'batch_size': 300,
-        'num_epochs': 5000,
+        'num_epochs': 3000,
         'drop_out': [.5, .5]
     },
     2: {
@@ -75,8 +75,8 @@ ensemble_hyperparams = {
         'read_out': [[1024, n], [n]],
         'test_size': .15,
         'batch_size': 200,
-        'num_epochs': 5000,
-        'drop_out': [.5, .5]
+        'num_epochs': 3000,
+        'drop_out': [.3, .25]
     },
     3: {
         'hidden_layer_1': [[5, 5, d, 64], [64]],
@@ -86,7 +86,7 @@ ensemble_hyperparams = {
         'read_out': [[1024, n], [n]],
         'test_size': .10,
         'batch_size': 250,
-        'num_epochs': 5000,
+        'num_epochs': 3000,
         'drop_out': [.5, .5]
     },
     4: {
@@ -97,8 +97,8 @@ ensemble_hyperparams = {
         'read_out': [[512, n], [n]],
         'test_size': .10,
         'batch_size': 300,
-        'num_epochs': 5000,
-        'drop_out': [.5, .5]
+        'num_epochs': 3000,
+        'drop_out': [.3, .25]
     },
     5: {
         'hidden_layer_1': [[5, 5, d, 64], [64]],
@@ -108,7 +108,7 @@ ensemble_hyperparams = {
         'read_out': [[512, n], [n]],
         'test_size': .15,
         'batch_size': 300,
-        'num_epochs': 5000,
+        'num_epochs': 3000,
         'drop_out': [.5, .5]
     },
     6: {
@@ -119,8 +119,8 @@ ensemble_hyperparams = {
         'read_out': [[1024, n], [n]],
         'test_size': .10,
         'batch_size': 300,
-        'num_epochs': 5000,
-        'drop_out': [.5, .5]
+        'num_epochs': 3000,
+        'drop_out': [.3, .25]
     }
 }
 
