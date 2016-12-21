@@ -201,7 +201,9 @@ def graph(hyperparams):
     # train
     cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits, y_)
     loss = tf.reduce_mean(cross_entropy)
-    train_step = tf.train.AdamOptimizer(learning_rate=1e-4, beta1=.9, beta2=.99).minimize(loss)
+    # train_step = tf.train.AdamOptimizer(learning_rate=1e-4, beta1=.9, beta2=.99).minimize(loss)
+    train_step = tf.train.RMSPropOptimizer(learning_rate=1e-4).minimize(loss)
+
 
     # eval
     correct_prediction = tf.equal(tf.argmax(logits, 1), tf.argmax(y_, 1))
