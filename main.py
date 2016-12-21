@@ -243,11 +243,15 @@ def optimise(train_iterator, valid_set, optimiser, metric, loss, drop_out=[.5, .
         x_batch = np.array(x_batch)
         y_batch = np.array(y_batch)
 
-        optimiser.run(feed_dict={x: x_batch, y_: y_batch, keep_prob_1: drop_out[0], keep_prob_2: drop_out[1]})
+        optimiser.run(feed_dict={x: x_batch, y_: y_batch, keep_prob_1: drop_out[0]
+            # , keep_prob_2: drop_out[1]
+                                 })
 
         if i % 5 == 0:
             valid_accuracy, loss_score = \
-                sess.run([metric, loss], feed_dict={x: valid_x, y_: valid_y, keep_prob_1: 1.0, keep_prob_2: 1.0})
+                sess.run([metric, loss], feed_dict={x: valid_x, y_: valid_y, keep_prob_1: 1.0
+                    # , keep_prob_2: 1.0
+                                                    })
             print("loop {4}, epoch {2}, step {0}, validation accuracy {1:.4f}, loss {3:.4f}".
                   format(i, valid_accuracy, epoch, loss_score, loop))
 
@@ -259,9 +263,13 @@ def evaluate(test, metric, valid_set):
     new_saver = tf.train.import_meta_graph(MODEL_PATH + 'model_ensemble_loop_{0}.ckpt.meta'.format(loop))
     new_saver.restore(save_path=MODEL_PATH + 'model_ensemble_loop_{0}.ckpt'.format(loop), sess=sess)
 
-    probability = sess.run(tf.nn.softmax(logits), feed_dict={x: test, keep_prob_1: 1.0, keep_prob_2: 1.0})
+    probability = sess.run(tf.nn.softmax(logits), feed_dict={x: test, keep_prob_1: 1.0
+        # , keep_prob_2: 1.0
+                                                             })
     valid_accuracy, valid_probability = \
-        sess.run([metric, tf.nn.softmax(logits)], feed_dict={x: valid_x, y_: valid_y, keep_prob_1: 1.0, keep_prob_2: 1.0})
+        sess.run([metric, tf.nn.softmax(logits)], feed_dict={x: valid_x, y_: valid_y, keep_prob_1: 1.0
+            # , keep_prob_2: 1.0
+                                                             })
 
     return probability, valid_accuracy, valid_probability
 
