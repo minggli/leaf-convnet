@@ -29,9 +29,17 @@ print(sys.argv[1:])
 EVAL = True if 'EVAL' in map(str.upper, sys.argv[1:]) else False
 ENSEMBLE = num_ensemble if 'ENSEMBLE' in map(str.upper, sys.argv[1:]) else 1
 IMAGE = True if 'IMAGE' in map(str.upper, sys.argv[1:]) else False
+IMAGEONLY = True if 'IMAGEONLY' in map(str.upper, sys.argv[1:]) else False
 
-d = 4 if IMAGE else 3
-images_lib = {k: pic_resize(IMAGE_PATH + str(k) + '.jpg', input_shape, pad=True) for k in range(1, 1585, 1)} if IMAGE else None
+if IMAGEONLY:
+    d = 1
+elif IMAGE:
+    d = 4
+else:
+    d = 3
+
+images_lib = {k: pic_resize(IMAGE_PATH + str(k) + '.jpg', input_shape, pad=True) for k in range(1, 1585, 1)} \
+    if IMAGE or IMAGEONLY else None
 
 train_data = transform(data=train, label=label, dim=d, pixels=images_lib, normalize=True)
 
