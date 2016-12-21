@@ -19,7 +19,7 @@ MODEL_PATH = 'models/'
 IMAGE_PATH = 'leaf/images/'
 INPUT_PATH = 'leaf/'
 
-num_ensemble = 7
+num_ensemble = 5
 train, label, data = extract(INPUT_PATH + 'train.csv', target='species')
 input_shape = (96, 96)
 m = functools.reduce(operator.mul, input_shape, 1)
@@ -74,20 +74,31 @@ ensemble_hyperparams = {
         'test_size': .15,
         'batch_size': 300,
         'num_epochs': 3000,
-        'drop_out': [.3, .25]
+        'drop_out': [.5, .5]
     },
     2: {
         'hidden_layer_1': [[5, 5, d, 16], [16]],
         'hidden_layer_2': [[5, 5, 16, 64], [64]],
-        'dense_conn_1': [[24 * 24 * 64, 2048], [2048], [-1, 24 * 24 * 64]],
-        'dense_conn_2': [[2048, 1024], [1024]],
+        'dense_conn_1': [[24 * 24 * 64, 1024], [1024], [-1, 24 * 24 * 64]],
+        'dense_conn_2': [[1024, 1024], [1024]],
         'read_out': [[1024, n], [n]],
         'test_size': .15,
         'batch_size': 200,
         'num_epochs': 3000,
-        'drop_out': [.3, .25]
+        'drop_out': [.5, .5]
     },
     3: {
+        'hidden_layer_1': [[5, 5, d, 64], [64]],
+        'hidden_layer_2': [[5, 5, 64, 128], [128]],
+        'dense_conn_1': [[24 * 24 * 128, 1024], [1024], [-1, 24 * 24 * 128]],
+        'dense_conn_2': [[1024, 512], [512]],
+        'read_out': [[512, n], [n]],
+        'test_size': .15,
+        'batch_size': 250,
+        'num_epochs': 3000,
+        'drop_out': [.5, .5]
+    },
+    4: {
         'hidden_layer_1': [[5, 5, d, 64], [64]],
         'hidden_layer_2': [[5, 5, 64, 128], [128]],
         'dense_conn_1': [[24 * 24 * 128, 2048], [2048], [-1, 24 * 24 * 128]],
@@ -97,39 +108,6 @@ ensemble_hyperparams = {
         'batch_size': 250,
         'num_epochs': 3000,
         'drop_out': [.5, .5]
-    },
-    4: {
-        'hidden_layer_1': [[5, 5, d, 8], [8]],
-        'hidden_layer_2': [[5, 5, 8, 32], [32]],
-        'dense_conn_1': [[24 * 24 * 32, 512], [512], [-1, 24 * 24 * 32]],
-        'dense_conn_2': [[512, 99], [99]],
-        'read_out': [[99, n], [n]],
-        'test_size': .10,
-        'batch_size': 300,
-        'num_epochs': 3000,
-        'drop_out': [.3, .25]
-    },
-    5: {
-        'hidden_layer_1': [[5, 5, d, 8], [8]],
-        'hidden_layer_2': [[5, 5, 8, 32], [32]],
-        'dense_conn_1': [[24 * 24 * 32, 1024], [1024], [-1, 24 * 24 * 32]],
-        'dense_conn_2': [[1024, 512], [512]],
-        'read_out': [[512, n], [n]],
-        'test_size': .15,
-        'batch_size': 300,
-        'num_epochs': 3000,
-        'drop_out': [.5, .5]
-    },
-    6: {
-        'hidden_layer_1': [[5, 5, d, 16], [16]],
-        'hidden_layer_2': [[5, 5, 16, 64], [64]],
-        'dense_conn_1': [[24 * 24 * 64, 1024], [1024], [-1, 24 * 24 * 64]],
-        'dense_conn_2': [[1024, 99], [99]],
-        'read_out': [[99, n], [n]],
-        'test_size': .10,
-        'batch_size': 300,
-        'num_epochs': 3000,
-        'drop_out': [.3, .25]
     }
 }
 
