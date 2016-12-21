@@ -21,7 +21,7 @@ INPUT_PATH = 'leaf/'
 
 num_ensemble = 5
 train, label, data = extract(INPUT_PATH + 'train.csv', target='species')
-input_shape = (48, 48)
+input_shape = (96, 96)
 m = functools.reduce(operator.mul, input_shape, 1)
 n = len(set(label))
 
