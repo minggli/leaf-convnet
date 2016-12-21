@@ -24,9 +24,9 @@ def transform(data, label, dim, input_shape, pixels=None, normalize=True):
         img = pd.DataFrame.from_dict(data=pixels, orient='index', dtype=np.float32)
 
     if normalize:
-        data = data.apply(preprocessing.scale, with_mean=True, with_std=True, axis=1)
+        data = data.apply(preprocessing.scale, with_mean=True, with_std=True, axis=0)
         if pixels is not None:
-            img = img.apply(preprocessing.scale, with_mean=True, with_std=True, axis=1)
+            img = img.apply(preprocessing.scale, with_mean=True, with_std=True, axis=0)
 
     margins = data.ix[:, data.columns.str.startswith('margin')]
     shapes = data.ix[:, data.columns.str.startswith('shape')]
