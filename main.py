@@ -24,6 +24,7 @@ train, label, data = extract(INPUT_PATH + 'train.csv', target='species')
 input_shape = (8, 8)
 m = functools.reduce(operator.mul, input_shape, 1)
 n = len(set(label))
+
 print(sys.argv[1:])
 
 EVAL = True if 'EVAL' in map(str.upper, sys.argv[1:]) else False
