@@ -24,7 +24,7 @@ def transform(data, label, dim, input_shape, pixels=None, normalize=True):
         img = pd.DataFrame.from_dict(data=pixels, orient='index', dtype=np.float32)
 
     if normalize:
-        data = data.apply(preprocessing.scale, with_mean=False, with_std=True, axis=0)
+        data = data.apply(preprocessing.scale, with_mean=True, with_std=True, axis=0)
         if pixels is not None:
             # img = pd.DataFrame(data=preprocessing.StandardScaler().fit(img).transform(img), index=img.index)
             img = img.apply(preprocessing.scale, with_mean=True, with_std=True, axis=0)

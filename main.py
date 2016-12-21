@@ -21,7 +21,7 @@ INPUT_PATH = 'leaf/'
 
 num_ensemble = 5
 train, label, data = extract(INPUT_PATH + 'train.csv', target='species')
-input_shape = (96, 96)
+input_shape = (8, 8)
 m = functools.reduce(operator.mul, input_shape, 1)
 n = len(set(label))
 
@@ -55,10 +55,10 @@ default = {
 ensemble_hyperparams = {
 
     0: {
-        'hidden_layer_1': [[5, 5, d, 8], [8]],
-        'hidden_layer_2': [[5, 5, 8, 32], [32]],
-        'hidden_layer_3': [[5, 5, 32, 64], [64]],
-        'dense_conn_1': [[12 * 12 * 64, 512], [512], [-1, 12 * 12 * 64]],
+        'hidden_layer_1': [[5, 5, d, 16], [16]],
+        'hidden_layer_2': [[5, 5, 16, 32], [32]],
+        # 'hidden_layer_3': [[5, 5, 32, 64], [64]],
+        'dense_conn_1': [[2 * 2 * 32, 512], [512], [-1, 2 * 2 * 32]],
         # 'dense_conn_2': [[512, 512], [512]],
         'read_out': [[512, n], [n]],
         'test_size': .15,
@@ -69,9 +69,9 @@ ensemble_hyperparams = {
     1: {
 
         'hidden_layer_1': [[5, 5, d, 16], [16]],
-        'hidden_layer_2': [[5, 5, 16, 32], [32]],
-        'hidden_layer_3': [[5, 5, 32, 64], [64]],
-        'dense_conn_1': [[12 * 12 * 64, 1024], [1024], [-1, 12 * 12 * 64]],
+        'hidden_layer_2': [[5, 5, 16, 64], [64]],
+        # 'hidden_layer_3': [[5, 5, 32, 64], [64]],
+        'dense_conn_1': [[2 * 2 * 64, 1024], [1024], [-1, 2 * 2 * 64]],
         # 'dense_conn_2': [[512, 512], [512]],
         'read_out': [[1024, n], [n]],
         'test_size': .10,
@@ -81,9 +81,9 @@ ensemble_hyperparams = {
     },
     2: {
         'hidden_layer_1': [[5, 5, d, 16], [16]],
-        'hidden_layer_2': [[5, 5, 16, 32], [32]],
-        'hidden_layer_3': [[5, 5, 32, 64], [64]],
-        'dense_conn_1': [[12 * 12 * 64, 1024], [1024], [-1, 12 * 12 * 64]],
+        'hidden_layer_2': [[5, 5, 16, 64], [64]],
+        # 'hidden_layer_3': [[5, 5, 32, 64], [64]],
+        'dense_conn_1': [[2 * 2 * 64, 1024], [1024], [-1, 2 * 2 * 64]],
         # 'dense_conn_2': [[512, 512], [512]],
         'read_out': [[1024, n], [n]],
         'test_size': .15,
@@ -92,10 +92,10 @@ ensemble_hyperparams = {
         'drop_out': [.5, .5]
     },
     3: {
-        'hidden_layer_1': [[5, 5, d, 8], [8]],
-        'hidden_layer_2': [[5, 5, 8, 32], [32]],
-        'hidden_layer_3': [[3, 3, 32, 64], [64]],
-        'dense_conn_1': [[12 * 12 * 64, 512], [512], [-1, 12 * 12 * 64]],
+        'hidden_layer_1': [[5, 5, d, 32], [32]],
+        'hidden_layer_2': [[5, 5, 32, 64], [64]],
+        # 'hidden_layer_3': [[3, 3, 32, 64], [64]],
+        'dense_conn_1': [[2 * 2 * 64, 512], [512], [-1, 2 * 2 * 64]],
         # 'dense_conn_2': [[512, 512], [512]],
         'read_out': [[512, n], [n]],
         'test_size': .15,
@@ -106,10 +106,10 @@ ensemble_hyperparams = {
     4: {
         'hidden_layer_1': [[5, 5, d, 8], [8]],
         'hidden_layer_2': [[5, 5, 8, 32], [32]],
-        'hidden_layer_3': [[3, 3, 32, 64], [64]],
-        'dense_conn_1': [[12 * 12 * 64, 200], [200], [-1, 12 * 12 * 64]],
+        # 'hidden_layer_3': [[3, 3, 32, 64], [64]],
+        'dense_conn_1': [[2 * 2 * 32, 512], [512], [-1, 2 * 2 * 32]],
         # 'dense_conn_2': [[512, 512], [512]],
-        'read_out': [[200, n], [n]],
+        'read_out': [[512, n], [n]],
         'test_size': .15,
         'batch_size': 250,
         'num_epochs': 3000,
@@ -176,20 +176,20 @@ def graph(hyperparams):
 
         h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
         h_pool2 = max_pool(h_conv2)
-
-    with tf.name_scope('hidden_layer_3'):
-        W_conv3 = weight_variable(hyperparams['hidden_layer_3'][0])
-        b_conv3 = bias_variable(hyperparams['hidden_layer_3'][1])
-
-        h_conv3 = tf.nn.relu(conv2d(h_pool2, W_conv3) + b_conv3)
-        h_pool3 = max_pool(h_conv3)
+    #
+    # with tf.name_scope('hidden_layer_3'):
+    #     W_conv3 = weight_variable(hyperparams['hidden_layer_3'][0])
+    #     b_conv3 = bias_variable(hyperparams['hidden_layer_3'][1])
+    #
+    #     h_conv3 = tf.nn.relu(conv2d(h_pool2, W_conv3) + b_conv3)
+    #     h_pool3 = max_pool(h_conv3)
 
     with tf.name_scope('dense_conn_1'):
         W_fc1 = weight_variable(hyperparams['dense_conn_1'][0])
         b_fc1 = bias_variable(hyperparams['dense_conn_1'][1])
 
-        h_pool3_flat = tf.reshape(h_pool3, hyperparams['dense_conn_1'][2])
-        h_fc1 = tf.nn.relu(tf.matmul(h_pool3_flat, W_fc1) + b_fc1)
+        h_pool2_flat = tf.reshape(h_pool2, hyperparams['dense_conn_1'][2])
+        h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
 
     with tf.name_scope('drop_out_1'):
         keep_prob_1 = tf.placeholder(tf.float32)
