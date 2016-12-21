@@ -63,7 +63,7 @@ ensemble_hyperparams = {
         'test_size': .15,
         'batch_size': 200,
         'num_epochs': 3000,
-        'drop_out': [.3, .25]
+        'drop_out': [.5, .5]
     },
     1: {
         'hidden_layer_1': [[5, 5, d, 8], [8]],
@@ -74,7 +74,7 @@ ensemble_hyperparams = {
         'test_size': .15,
         'batch_size': 300,
         'num_epochs': 3000,
-        'drop_out': [.5, .5]
+        'drop_out': [.3, .25]
     },
     2: {
         'hidden_layer_1': [[5, 5, d, 16], [16]],
