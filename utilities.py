@@ -32,18 +32,28 @@ def transform(data, label, dim, pixels=None, normalize=True):
     shapes = data.ix[:, data.columns.str.startswith('shape')]
     textures = data.ix[:, data.columns.str.startswith('texture')]
 
-    if label is not None and pixels is not None:
-        transformed = \
-            [(np.concatenate((margins.ix[i, :], shapes.ix[i, :], textures.ix[i, :], img.ix[i, :]), axis=0).reshape(dim, 64), label.ix[i, :]) for i in data.index]
-    if label is not None and pixels is None:
-        transformed = \
-            [(np.concatenate((margins.ix[i, :], shapes.ix[i, :], textures.ix[i, :]), axis=0).reshape(dim, 64), label.ix[i, :]) for i in data.index]
-    if label is None and pixels is not None:
-        transformed = \
-            [np.concatenate((margins.ix[i, :], shapes.ix[i, :], textures.ix[i, :], img.ix[i, :]), axis=0).reshape(dim, 64) for i in data.index]
-    if label is None and pixels is None:
-        transformed = \
-            [np.concatenate((margins.ix[i, :], shapes.ix[i, :], textures.ix[i, :]), axis=0).reshape(dim, 64) for i in data.index]
+    if dim > 1:
+
+        if label is not None and pixels is not None:
+            transformed = \
+                [(np.concatenate((margins.ix[i, :], shapes.ix[i, :], textures.ix[i, :], img.ix[i, :]), axis=0).reshape(dim, 64), label.ix[i, :]) for i in data.index]
+        if label is not None and pixels is None:
+            transformed = \
+                [(np.concatenate((margins.ix[i, :], shapes.ix[i, :], textures.ix[i, :]), axis=0).reshape(dim, 64), label.ix[i, :]) for i in data.index]
+        if label is None and pixels is not None:
+            transformed = \
+                [np.concatenate((margins.ix[i, :], shapes.ix[i, :], textures.ix[i, :], img.ix[i, :]), axis=0).reshape(dim, 64) for i in data.index]
+        if label is None and pixels is None:
+            transformed = \
+                [np.concatenate((margins.ix[i, :], shapes.ix[i, :], textures.ix[i, :]), axis=0).reshape(dim, 64) for i in data.index]
+
+    else:
+        if label is not None and pixels is not None:
+            transformed = \
+                [(np.array(img.ix[i, :]).reshape(dim, 64), label.ix[i, :]) for i in data.index]
+        if label is None and pixels is not None:
+            transformed = \
+                [(np.array(img.ix[i, :]).reshape(dim, 64)) for i in data.index]
 
     return np.array(transformed)
 
