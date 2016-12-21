@@ -26,7 +26,7 @@ def transform(data, label, dim, input_shape, pixels=None, normalize=True):
     if normalize:
         data = data.apply(preprocessing.scale, with_mean=False, with_std=True, axis=0)
         if pixels is not None:
-            img = img.apply(preprocessing.minmax_scale, feature_range=(0, 1), axis=0)
+            img = img.apply(preprocessing.scale, with_mean=False, with_std=True, axis=0)
 
     margins = data.ix[:, data.columns.str.startswith('margin')]
     shapes = data.ix[:, data.columns.str.startswith('shape')]
