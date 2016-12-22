@@ -64,7 +64,7 @@ ensemble_hyperparams = {
         'alpha': 1e-5,
         'test_size': .25,
         'batch_size': 200,
-        'num_epochs': 3000,
+        'num_epochs': 7000,
         'drop_out': [.5, .5]
     },
     1: {
