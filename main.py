@@ -61,6 +61,7 @@ ensemble_hyperparams = {
         'dense_conn_1': [[2 * 2 * 32, 512], [512], [-1, 2 * 2 * 32]],
         # 'dense_conn_2': [[512, 512], [512]],
         'read_out': [[512, n], [n]],
+        'alpha': 1e-3,
         'test_size': .15,
         'batch_size': 200,
         'num_epochs': 2000,
@@ -74,6 +75,7 @@ ensemble_hyperparams = {
         'dense_conn_1': [[2 * 2 * 128, 1024], [1024], [-1, 2 * 2 * 128]],
         # 'dense_conn_2': [[512, 512], [512]],
         'read_out': [[1024, n], [n]],
+        'alpha': 1e-4,
         'test_size': .15,
         'batch_size': 200,
         'num_epochs': 2000,
@@ -85,6 +87,7 @@ ensemble_hyperparams = {
         # 'hidden_layer_3': [[5, 5, 32, 64], [64]],
         'dense_conn_1': [[2 * 2 * 64, 1024], [1024], [-1, 2 * 2 * 64]],
         # 'dense_conn_2': [[512, 512], [512]],
+        'alpha': 1e-4,
         'read_out': [[1024, n], [n]],
         'test_size': .15,
         'batch_size': 200,
@@ -98,6 +101,7 @@ ensemble_hyperparams = {
         'dense_conn_1': [[2 * 2 * 64, 1024], [1024], [-1, 2 * 2 * 64]],
         # 'dense_conn_2': [[512, 512], [512]],
         'read_out': [[1024, n], [n]],
+        'alpha': 1e-4,
         'test_size': .20,
         'batch_size': 250,
         'num_epochs': 2000,
@@ -110,6 +114,7 @@ ensemble_hyperparams = {
         'dense_conn_1': [[2 * 2 * 32, 1024], [1024], [-1, 2 * 2 * 32]],
         # 'dense_conn_2': [[512, 512], [512]],
         'read_out': [[1024, n], [n]],
+        'alpha': 1e-4,
         'test_size': .20,
         'batch_size': 250,
         'num_epochs': 2000,
@@ -214,8 +219,8 @@ def graph(hyperparams):
     # train
     cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits, y_)
     loss = tf.reduce_mean(cross_entropy)
-    train_step = tf.train.AdamOptimizer(learning_rate=1e-4, beta1=.9, beta2=.99).minimize(loss)
-    # train_step = tf.train.RMSPropOptimizer(learning_rate=1e-4).minimize(loss)
+    # train_step = tf.train.AdamOptimizer(learning_rate=hyperparams['alpha'], beta1=.9, beta2=.99).minimize(loss)
+    train_step = tf.train.RMSPropOptimizer(learning_rate=hyperparams['alpha']).minimize(loss)
 
 
     # eval
