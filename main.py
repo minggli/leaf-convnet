@@ -62,7 +62,7 @@ ensemble_hyperparams = {
         # 'dense_conn_2': [[512, 512], [512]],
         'read_out': [[512, n], [n]],
         'alpha': 1e-3,
-        'test_size': .15,
+        'test_size': .25,
         'batch_size': 200,
         'num_epochs': 3000,
         'drop_out': [.5, .5]
@@ -76,7 +76,7 @@ ensemble_hyperparams = {
         # 'dense_conn_2': [[512, 512], [512]],
         'read_out': [[1024, n], [n]],
         'alpha': 1e-3,
-        'test_size': .15,
+        'test_size': .25,
         'batch_size': 200,
         'num_epochs': 3000,
         'drop_out': [.4, .5]
@@ -89,7 +89,7 @@ ensemble_hyperparams = {
         # 'dense_conn_2': [[512, 512], [512]],
         'alpha': 1e-3,
         'read_out': [[1024, n], [n]],
-        'test_size': .15,
+        'test_size': .25,
         'batch_size': 200,
         'num_epochs': 3000,
         'drop_out': [.5, .5]
