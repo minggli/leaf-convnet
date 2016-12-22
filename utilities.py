@@ -32,7 +32,7 @@ def transform(data, label, dim, input_shape, pixels=None, normalize=True):
     shapes = data.ix[:, data.columns.str.startswith('shape')]
     textures = data.ix[:, data.columns.str.startswith('texture')]
 
-    if dim > 1:
+    if dim == 1:
 
         if label is not None and pixels is not None:
             transformed = \
