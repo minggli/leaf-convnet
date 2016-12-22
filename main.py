@@ -63,57 +63,57 @@ ensemble_hyperparams = {
         'read_out': [[512, n], [n]],
         'test_size': .15,
         'batch_size': 200,
-        'num_epochs': 3000,
+        'num_epochs': 2000,
         'drop_out': [.5, .5]
     },
     1: {
 
-        'hidden_layer_1': [[5, 5, d, 16], [16]],
-        'hidden_layer_2': [[5, 5, 16, 64], [64]],
+        'hidden_layer_1': [[5, 5, d, 64], [64]],
+        'hidden_layer_2': [[5, 5, 64, 128], [128]],
         # 'hidden_layer_3': [[5, 5, 32, 64], [64]],
-        'dense_conn_1': [[2 * 2 * 64, 1024], [1024], [-1, 2 * 2 * 64]],
+        'dense_conn_1': [[2 * 2 * 128, 1024], [1024], [-1, 2 * 2 * 128]],
         # 'dense_conn_2': [[512, 512], [512]],
         'read_out': [[1024, n], [n]],
-        'test_size': .10,
-        'batch_size': 300,
-        'num_epochs': 3000,
-        'drop_out': [.5, .5]
+        'test_size': .15,
+        'batch_size': 250,
+        'num_epochs': 2000,
+        'drop_out': [.4, .5]
     },
     2: {
-        'hidden_layer_1': [[5, 5, d, 16], [16]],
-        'hidden_layer_2': [[5, 5, 16, 64], [64]],
+        'hidden_layer_1': [[5, 5, d, 32], [32]],
+        'hidden_layer_2': [[5, 5, 32, 64], [64]],
         # 'hidden_layer_3': [[5, 5, 32, 64], [64]],
         'dense_conn_1': [[2 * 2 * 64, 1024], [1024], [-1, 2 * 2 * 64]],
         # 'dense_conn_2': [[512, 512], [512]],
         'read_out': [[1024, n], [n]],
         'test_size': .15,
         'batch_size': 200,
-        'num_epochs': 3000,
+        'num_epochs': 2000,
         'drop_out': [.5, .5]
     },
     3: {
         'hidden_layer_1': [[5, 5, d, 32], [32]],
-        'hidden_layer_2': [[5, 5, 32, 64], [64]],
+        'hidden_layer_2': [[3, 3, 32, 64], [64]],
         # 'hidden_layer_3': [[3, 3, 32, 64], [64]],
-        'dense_conn_1': [[2 * 2 * 64, 512], [512], [-1, 2 * 2 * 64]],
+        'dense_conn_1': [[2 * 2 * 64, 1024], [1024], [-1, 2 * 2 * 64]],
         # 'dense_conn_2': [[512, 512], [512]],
-        'read_out': [[512, n], [n]],
+        'read_out': [[1024, n], [n]],
         'test_size': .15,
         'batch_size': 250,
-        'num_epochs': 3000,
+        'num_epochs': 2000,
         'drop_out': [.5, .5]
     },
     4: {
-        'hidden_layer_1': [[5, 5, d, 8], [8]],
-        'hidden_layer_2': [[5, 5, 8, 32], [32]],
+        'hidden_layer_1': [[5, 5, d, 16], [16]],
+        'hidden_layer_2': [[3, 3, 16, 32], [32]],
         # 'hidden_layer_3': [[3, 3, 32, 64], [64]],
-        'dense_conn_1': [[2 * 2 * 32, 512], [512], [-1, 2 * 2 * 32]],
+        'dense_conn_1': [[2 * 2 * 32, 1024], [1024], [-1, 2 * 2 * 32]],
         # 'dense_conn_2': [[512, 512], [512]],
-        'read_out': [[512, n], [n]],
-        'test_size': .15,
+        'read_out': [[1024, n], [n]],
+        'test_size': .20,
         'batch_size': 250,
-        'num_epochs': 3000,
-        'drop_out': [.5, .5]
+        'num_epochs': 2000,
+        'drop_out': [.4, .5]
     }
 }
 
