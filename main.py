@@ -75,7 +75,7 @@ ensemble_hyperparams = {
         # 'dense_conn_2': [[512, 512], [512]],
         'read_out': [[1024, n], [n]],
         'test_size': .15,
-        'batch_size': 250,
+        'batch_size': 200,
         'num_epochs': 2000,
         'drop_out': [.4, .5]
     },
@@ -98,7 +98,7 @@ ensemble_hyperparams = {
         'dense_conn_1': [[2 * 2 * 64, 1024], [1024], [-1, 2 * 2 * 64]],
         # 'dense_conn_2': [[512, 512], [512]],
         'read_out': [[1024, n], [n]],
-        'test_size': .15,
+        'test_size': .20,
         'batch_size': 250,
         'num_epochs': 2000,
         'drop_out': [.5, .5]
@@ -176,7 +176,7 @@ def graph(hyperparams):
 
         h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
         h_pool2 = max_pool(h_conv2)
-    #
+
     # with tf.name_scope('hidden_layer_3'):
     #     W_conv3 = weight_variable(hyperparams['hidden_layer_3'][0])
     #     b_conv3 = bias_variable(hyperparams['hidden_layer_3'][1])
@@ -194,7 +194,7 @@ def graph(hyperparams):
     with tf.name_scope('drop_out_1'):
         keep_prob_1 = tf.placeholder(tf.float32)
         h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob_1)
-    #
+
     # with tf.name_scope('dense_conn_2'):
     #     W_fc2 = weight_variable(hyperparams['dense_conn_2'][0])
     #     b_fc2 = bias_variable(hyperparams['dense_conn_2'][1])
