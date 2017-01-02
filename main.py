@@ -107,10 +107,10 @@ ensemble_hyperparams = {
         'drop_out': [.5, .5]
     },
     4: {
-        'hidden_layer_1': [[5, 5, d, 64], [64]],
-        'hidden_layer_2': [[5, 5, 64, 128], [128]],
+        'hidden_layer_1': [[5, 5, d, 32], [32]],
+        'hidden_layer_2': [[5, 5, 32, 64], [64]],
         # 'hidden_layer_3': [[3, 3, 32, 64], [64]],
-        'dense_conn_1': [[2 * 2 * 128, 1024], [1024], [-1, 2 * 2 * 128]],
+        'dense_conn_1': [[2 * 2 * 64, 1024], [1024], [-1, 2 * 2 * 64]],
         # 'dense_conn_2': [[512, 512], [512]],
         'read_out': [[1024, n], [n]],
         'alpha': 1e-4,
@@ -305,6 +305,8 @@ if __name__ == '__main__':
         test_data = transform(data=test, label=None, dim=d, input_shape=m, pixels=images_lib, normalize=True)
 
         for loop in range(ENSEMBLE):
+
+            # establish a new Graph for a fresh session in Tensorflow
 
             g = tf.Graph()
 
