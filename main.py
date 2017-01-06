@@ -210,7 +210,7 @@ def graph(hyperparams):
 
 def optimise(train_iterator, valid_set, optimiser, metric, loss, drop_out=[.5, .5]):
 
-    print('\n\n\n\n starting neural network #{}... \n'. format(loop))
+    print('\n\n\n\nstarting neural network #{}... \n'. format(loop))
 
     for i in sorted(ensemble_hyperparams[loop]):
         print('{0}:{1}'.format(i, ensemble_hyperparams[loop][i]), end='\n', flush=False)
