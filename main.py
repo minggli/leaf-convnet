@@ -21,26 +21,30 @@ INPUT_PATH = 'leaf/'
 
 num_ensemble = 5
 train, label, data = extract(INPUT_PATH + 'train.csv', target='species')
-input_shape = (8, 8)
-m = functools.reduce(operator.mul, input_shape, 1)
-n = len(set(label))
 
 print(sys.argv[1:])
 
 EVAL = True if 'EVAL' in map(str.upper, sys.argv[1:]) else False
 ENSEMBLE = num_ensemble if 'ENSEMBLE' in map(str.upper, sys.argv[1:]) else 1
-IMAGE = True if 'IMAGE' in map(str.upper, sys.argv[1:]) else False
+WITHIMAGE = True if 'WITHIMAGE' in map(str.upper, sys.argv[1:]) else False
 IMAGEONLY = True if 'IMAGEONLY' in map(str.upper, sys.argv[1:]) else False
 
 if IMAGEONLY:
     d = 1
-elif IMAGE:
+    input_shape = (96, 96)
+elif WITHIMAGE:
     d = 4
+    input_shape = (8, 8)
 else:
     d = 3
+    input_shape = (8, 8)
+
+m = functools.reduce(operator.mul, input_shape, 1)
+n = len(set(label))
+
 
 images_lib = {k: pic_resize(IMAGE_PATH + str(k) + '.jpg', input_shape, pad=True) for k in range(1, 1585, 1)} \
-    if IMAGE or IMAGEONLY else None
+    if WITHIMAGE or IMAGEONLY else None
 
 train_data = transform(data=train, label=label, dim=d, input_shape=m, pixels=images_lib, normalize=True)
 
