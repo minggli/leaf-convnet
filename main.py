@@ -42,7 +42,6 @@ else:
 m = functools.reduce(operator.mul, input_shape, 1)
 n = len(set(label))
 
-
 images_lib = {k: pic_resize(IMAGE_PATH + str(k) + '.jpg', input_shape, pad=True) for k in range(1, 1585, 1)} \
     if WITHIMAGE or IMAGEONLY else None
 
