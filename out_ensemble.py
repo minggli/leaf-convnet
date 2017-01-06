@@ -19,7 +19,9 @@ regressand = data['species']
 kf = model_selection.StratifiedKFold(n_splits=5, shuffle=False)
 
 # Logistics Regression
-clf = linear_model.LogisticRegression(fit_intercept=False)
+# regressors = np.column_stack((np.ones(len(regressors)), regressors))
+
+clf = linear_model.LogisticRegression(fit_intercept=True)
 
 average_score = model_selection.cross_val_score(clf, regressors, regressand, scoring='accuracy', cv=kf)
 print('Using given features by Kaggle, Logistic Regression model accuracy is: ', end='')
