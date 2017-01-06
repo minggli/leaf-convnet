@@ -212,8 +212,9 @@ def optimise(train_iterator, valid_set, optimiser, metric, loss, drop_out=[.5, .
 
     print('\n\n\n\n starting neural network #{}... \n'. format(loop))
 
-    for i in ensemble_hyperparams[loop]:
-        print('{0}:{1}'.format(i, ensemble_hyperparams[loop][i]))
+    for i in sorted(ensemble_hyperparams[loop]):
+        print('{0}:{1}'.format(i, ensemble_hyperparams[loop][i]), end='\n', flush=False)
+    print('\n', flush=True)
 
     valid_x, valid_y = zip(*valid_set)
 
