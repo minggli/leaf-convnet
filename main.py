@@ -181,13 +181,6 @@ def graph(hyperparams):
         h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
         h_pool2 = max_pool(h_conv2)
 
-    # with tf.name_scope('hidden_layer_3'):
-    #     W_conv3 = weight_variable(hyperparams['hidden_layer_3'][0])
-    #     b_conv3 = bias_variable(hyperparams['hidden_layer_3'][1])
-    #
-    #     h_conv3 = tf.nn.relu(conv2d(h_pool2, W_conv3) + b_conv3)
-    #     h_pool3 = max_pool(h_conv3)
-
     with tf.name_scope('dense_conn_1'):
         W_fc1 = weight_variable(hyperparams['dense_conn_1'][0])
         b_fc1 = bias_variable(hyperparams['dense_conn_1'][1])
@@ -198,16 +191,6 @@ def graph(hyperparams):
     with tf.name_scope('drop_out_1'):
         keep_prob_1 = tf.placeholder(tf.float32)
         h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob_1)
-
-    # with tf.name_scope('dense_conn_2'):
-    #     W_fc2 = weight_variable(hyperparams['dense_conn_2'][0])
-    #     b_fc2 = bias_variable(hyperparams['dense_conn_2'][1])
-    #
-    #     h_fc2 = tf.nn.relu(tf.matmul(h_fc1_drop, W_fc2) + b_fc2)
-    #
-    # with tf.name_scope('drop_out_2'):
-    #     keep_prob_2 = tf.placeholder(tf.float32)
-    #     h_fc2_drop = tf.nn.dropout(h_fc2, keep_prob_2)
 
     with tf.name_scope('read_out'):
         W_fc3 = weight_variable(hyperparams['read_out'][0])
@@ -247,15 +230,11 @@ def optimise(train_iterator, valid_set, optimiser, metric, loss, drop_out=[.5, .
         x_batch = np.array(x_batch)
         y_batch = np.array(y_batch)
 
-        optimiser.run(feed_dict={x: x_batch, y_: y_batch, keep_prob_1: drop_out[0]
-            # , keep_prob_2: drop_out[1]
-                                 })
+        optimiser.run(feed_dict={x: x_batch, y_: y_batch, keep_prob_1: drop_out[0]})
 
         if i % 5 == 0:
             valid_accuracy, loss_score = \
-                sess.run([metric, loss], feed_dict={x: valid_x, y_: valid_y, keep_prob_1: 1.0
-                    # , keep_prob_2: 1.0
-                                                    })
+                sess.run([metric, loss], feed_dict={x: valid_x, y_: valid_y, keep_prob_1: 1.0})
             print("loop {4}, epoch {2}, step {0}, validation accuracy {1:.4f}, loss {3:.4f}".
                   format(i, valid_accuracy, epoch, loss_score, loop))
 
@@ -267,13 +246,9 @@ def evaluate(test, metric, valid_set):
     new_saver = tf.train.import_meta_graph(MODEL_PATH + 'model_ensemble_loop_{0}.ckpt.meta'.format(loop))
     new_saver.restore(save_path=MODEL_PATH + 'model_ensemble_loop_{0}.ckpt'.format(loop), sess=sess)
 
-    probability = sess.run(tf.nn.softmax(logits), feed_dict={x: test, keep_prob_1: 1.0
-        # , keep_prob_2: 1.0
-                                                             })
+    probability = sess.run(tf.nn.softmax(logits), feed_dict={x: test, keep_prob_1: 1.0})
     valid_accuracy, valid_probability = \
-        sess.run([metric, tf.nn.softmax(logits)], feed_dict={x: valid_x, y_: valid_y, keep_prob_1: 1.0
-            # , keep_prob_2: 1.0
-                                                             })
+        sess.run([metric, tf.nn.softmax(logits)], feed_dict={x: valid_x, y_: valid_y, keep_prob_1: 1.0})
 
     return probability, valid_accuracy, valid_probability
 
@@ -311,6 +286,7 @@ if __name__ == '__main__':
             g = tf.Graph()
 
             with g.as_default():
+
                 graph(ensemble_hyperparams[loop])
 
                 prob, val_accuracy, val_prob = evaluate(test=test_data, metric=accuracy, valid_set=valid_set)
