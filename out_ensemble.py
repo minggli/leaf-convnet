@@ -15,7 +15,7 @@ train, label, data = extract(INPUT_PATH + 'train.csv', target='species')
 _, _, test = extract(INPUT_PATH + 'test.csv')
 
 val_prob = list()
-cnn_result = pd.read_csv('0.03074.csv', index_col='id', encoding='utf-8')
+cnn_result = pd.read_csv('submission.csv', index_col='id', encoding='utf-8')
 val_prob.append(np.array(cnn_result))
 
 scaler = preprocessing.StandardScaler(with_std=True, with_mean=False)

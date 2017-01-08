@@ -62,7 +62,7 @@ ensemble_hyperparams = {
         'hidden_layer_2': [[5, 5, 16, 32], [32]],
         'dense_conn_1': [[16 * 16 * 32, 512], [512], [-1, 16 * 16 * 32]],
         'read_out': [[512, n], [n]],
-        'alpha': 1e-5,
+        'alpha': 1e-4,
         'test_size': .25,
         'batch_size': 200,
         'num_epochs': 7000,
@@ -195,8 +195,6 @@ def graph(hyperparams):
     cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits, y_)
     loss = tf.reduce_mean(cross_entropy)
     train_step = tf.train.AdamOptimizer(learning_rate=hyperparams['alpha'], beta1=.9, beta2=.99).minimize(loss)
-    # train_step = tf.train.RMSPropOptimizer(learning_rate=hyperparams['alpha']).minimize(loss)
-
 
     # eval
     correct_prediction = tf.equal(tf.argmax(logits, 1), tf.argmax(y_, 1))
