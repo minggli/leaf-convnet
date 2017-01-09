@@ -251,7 +251,7 @@ def submit(raw):
 
     move_classified(test_data=raw, train_data=data, columns=label.columns, index=test.index, path=IMAGE_PATH)
 
-    df = pd.DataFrame(data=raw, columns=label.columns, dtype=np.float32, index=test.index)
+    df = pd.DataFrame(data=raw, columns=label.columns, index=test.index)
     df.to_csv('submission.csv', encoding='utf-8', header=True, index=True)
 
 
@@ -293,7 +293,7 @@ if __name__ == '__main__':
 
         print('Ensemble Network of ({0}), Validation Accuracy: {1:.4f}'.format(loop + 1, ensemble_val_accuracy))
 
-        ensemble_prob = np.mean(np.array([probs[i] for i in range(ENSEMBLE)]), axis=0)
+        ensemble_prob = np.around(np.mean(probs, axis=0), decimals=1)
         submit(raw=ensemble_prob)
 
     else:
