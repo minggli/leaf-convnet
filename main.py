@@ -50,7 +50,7 @@ train_data = transform(data=train, label=label, dim=d, input_shape=m, pixels=ima
 default = {
     'hidden_layer_1': [[5, 5, d, 32], [32]],
     'hidden_layer_2': [[5, 5, 32, 64], [64]],
-    'dense_conn_1': [[16 * 16 * 64, 1024], [1024], [-1, 16 * 16 * 64]],
+    'dense_conn_1': [[2 * 2 * 64, 1024], [1024], [-1, 2 * 2 * 64]],
     'dense_conn_2': [[2048, 1024], [1024]],
     'read_out': [[1024, n], [n]]
 }
@@ -60,7 +60,7 @@ ensemble_hyperparams = {
     0: {
         'hidden_layer_1': [[5, 5, d, 16], [16]],
         'hidden_layer_2': [[5, 5, 16, 32], [32]],
-        'dense_conn_1': [[16 * 16 * 32, 512], [512], [-1, 16 * 16 * 32]],
+        'dense_conn_1': [[2 * 2 * 32, 512], [512], [-1, 2 * 2 * 32]],
         'read_out': [[512, n], [n]],
         'alpha': 1e-4,
         'test_size': .25,
@@ -71,7 +71,7 @@ ensemble_hyperparams = {
     1: {
         'hidden_layer_1': [[5, 5, d, 64], [64]],
         'hidden_layer_2': [[5, 5, 64, 128], [128]],
-        'dense_conn_1': [[16 * 16 * 128, 1024], [1024], [-1, 16 * 16 * 128]],
+        'dense_conn_1': [[2 * 2 * 128, 1024], [1024], [-1, 2 * 2 * 128]],
         'read_out': [[1024, n], [n]],
         'alpha': 1e-3,
         'test_size': .25,
@@ -82,7 +82,7 @@ ensemble_hyperparams = {
     2: {
         'hidden_layer_1': [[5, 5, d, 64], [64]],
         'hidden_layer_2': [[5, 5, 64, 128], [128]],
-        'dense_conn_1': [[16 * 16 * 128, 1024], [1024], [-1, 16 * 16 * 128]],
+        'dense_conn_1': [[2 * 2 * 128, 1024], [1024], [-1, 2 * 2 * 128]],
         'alpha': 1e-4,
         'read_out': [[1024, n], [n]],
         'test_size': .25,
@@ -93,7 +93,7 @@ ensemble_hyperparams = {
     3: {
         'hidden_layer_1': [[5, 5, d, 64], [64]],
         'hidden_layer_2': [[5, 5, 64, 128], [128]],
-        'dense_conn_1': [[16 * 16 * 128, 1024], [1024], [-1, 16 * 16 * 128]],
+        'dense_conn_1': [[2 * 2 * 128, 1024], [1024], [-1, 2 * 2 * 128]],
         'read_out': [[1024, n], [n]],
         'alpha': 1e-3,
         'test_size': .20,
@@ -104,7 +104,7 @@ ensemble_hyperparams = {
     4: {
         'hidden_layer_1': [[5, 5, d, 32], [32]],
         'hidden_layer_2': [[5, 5, 32, 64], [64]],
-        'dense_conn_1': [[16 * 16 * 64, 1024], [1024], [-1, 16 * 16 * 64]],
+        'dense_conn_1': [[2 * 2 * 64, 1024], [1024], [-1, 2 * 2 * 64]],
         'read_out': [[1024, n], [n]],
         'alpha': 1e-4,
         'test_size': .20,
