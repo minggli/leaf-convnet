@@ -55,7 +55,7 @@ default = {
         'alpha': 1e-4,
         'test_size': .15,
         'batch_size': 200,
-        'num_epochs': 30,
+        'num_epochs': 2500,
         'drop_out': [.5, .5]
     }
 
