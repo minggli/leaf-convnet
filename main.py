@@ -297,7 +297,7 @@ if __name__ == '__main__':
 
         print('Ensemble Network of ({0}), Validation Accuracy: {1:.4f}'.format(loop + 1, ensemble_val_accuracy))
 
-        ensemble_prob = np.around(np.mean(probs, axis=0), decimals=1)
+        ensemble_prob = np.mean(probs, axis=0)
         submit(raw=ensemble_prob)
 
     else:
