@@ -56,7 +56,7 @@ default = {
         'test_size': .20,
         'batch_size': 200,
         'num_epochs': 5000,
-        'drop_out': [.5, .5]
+        'drop_out': [.4, .5]
     }
 
 ensemble_hyperparams = {
@@ -69,7 +69,7 @@ ensemble_hyperparams = {
         'alpha': 1e-4,
         'test_size': .25,
         'batch_size': 200,
-        'num_epochs': 7000,
+        'num_epochs': 5000,
         'drop_out': [.5, .5]
     },
     1: {
@@ -77,10 +77,10 @@ ensemble_hyperparams = {
         'hidden_layer_2': [[5, 5, 64, 128], [128]],
         'dense_conn_1': [[2 * 2 * 128, 1024], [1024], [-1, 2 * 2 * 128]],
         'read_out': [[1024, n], [n]],
-        'alpha': 1e-3,
+        'alpha': 1e-4,
         'test_size': .25,
         'batch_size': 200,
-        'num_epochs': 3000,
+        'num_epochs': 5000,
         'drop_out': [.4, .5]
     },
     2: {
@@ -92,18 +92,18 @@ ensemble_hyperparams = {
         'test_size': .25,
         'batch_size': 200,
         'num_epochs': 5000,
-        'drop_out': [.5, .5]
+        'drop_out': [.4, .5]
     },
     3: {
         'hidden_layer_1': [[5, 5, d, 64], [64]],
         'hidden_layer_2': [[5, 5, 64, 128], [128]],
         'dense_conn_1': [[2 * 2 * 128, 1024], [1024], [-1, 2 * 2 * 128]],
         'read_out': [[1024, n], [n]],
-        'alpha': 1e-3,
+        'alpha': 5e-4,
         'test_size': .20,
         'batch_size': 250,
         'num_epochs': 3000,
-        'drop_out': [.5, .5]
+        'drop_out': [.4, .5]
     },
     4: {
         'hidden_layer_1': [[5, 5, d, 32], [32]],
@@ -292,7 +292,7 @@ if __name__ == '__main__':
 
             print('Network: {0}, Validation Accuracy: {1:.4f}'.format(loop, val_accuracy))
 
-        ensemble_val_prob = np.mean(np.array([val_probs[i] for i in range(ENSEMBLE)]), axis=0)
+        ensemble_val_prob = np.mean(val_probs, axis=0)
         ensemble_val_accuracy = sum(ensemble_val_prob.argmax(axis=1) == np.array(valid_y).argmax(axis=1)) / len(valid_y)
 
         print('Ensemble Network of ({0}), Validation Accuracy: {1:.4f}'.format(loop + 1, ensemble_val_accuracy))
