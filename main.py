@@ -48,12 +48,12 @@ images_lib = {k: pic_resize(IMAGE_PATH + str(k) + '.jpg', input_shape, pad=True)
 train_data = transform(data=train, label=label, dim=d, input_shape=m, pixels=images_lib, normalize=True)
 
 default = {
-        'hidden_layer_1': [[5, 5, d, 64], [64]],
-        'hidden_layer_2': [[5, 5, 64, 128], [128]],
-        'dense_conn_1': [[2 * 2 * 128, 1024], [1024], [-1, 2 * 2 * 128]],
+        'hidden_layer_1': [[5, 5, d, 32], [32]],
+        'hidden_layer_2': [[5, 5, 32, 64], [64]],
+        'dense_conn_1': [[2 * 2 * 64, 1024], [1024], [-1, 2 * 2 * 64]],
         'read_out': [[1024, n], [n]],
-        'alpha': 1e-4,
-        'test_size': .15,
+        'alpha': 8e-5,
+        'test_size': .20,
         'batch_size': 200,
         'num_epochs': 2500,
         'drop_out': [.5, .5]
