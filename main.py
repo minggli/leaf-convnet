@@ -55,7 +55,7 @@ default = {
         'alpha': 1e-4,
         'test_size': .15,
         'batch_size': 200,
-        'num_epochs': 3000,
+        'num_epochs': 30,
         'drop_out': [.5, .5]
     }
 
@@ -213,8 +213,8 @@ def optimise(train_iterator, valid_set, optimiser, metric, loss, drop_out=[.5, .
 
     print('\n\n\n\nstarting neural network #{}... \n'. format(loop))
 
-    for i in sorted(ensemble_hyperparams[loop]):
-        print('{0}:{1}'.format(i, ensemble_hyperparams[loop][i]), end='\n', flush=False)
+    for i in sorted(default):
+        print('{0}:{1}'.format(i, default[i]), end='\n', flush=False)
     print('\n', flush=True)
 
     valid_x, valid_y = zip(*valid_set)
@@ -283,7 +283,7 @@ if __name__ == '__main__':
 
             with g.as_default():
 
-                graph(ensemble_hyperparams[loop])
+                graph(default)
 
                 prob, val_accuracy, val_prob = evaluate(test=test_data, metric=accuracy, valid_set=valid_set)
                 probs.append(prob)
@@ -305,20 +305,20 @@ if __name__ == '__main__':
         for loop in range(ENSEMBLE):
 
             train_set, valid_set = \
-                generate_training_set(data=train_data, test_size=ensemble_hyperparams[loop]['test_size'])
+                generate_training_set(data=train_data, test_size=default['test_size'])
 
-            batches = batch_iter(data=train_set, batch_size=ensemble_hyperparams[loop]['batch_size'],
-                                 num_epochs=ensemble_hyperparams[loop]['num_epochs'], shuffle=True)
+            batches = batch_iter(data=train_set, batch_size=default['batch_size'],
+                                 num_epochs=default['num_epochs'], shuffle=True)
 
             g = tf.Graph()
 
             with g.as_default():
-                graph(ensemble_hyperparams[loop])
+                graph(default)
 
                 with sess.as_default():
                     sess.run(initializer)
                     optimise(train_iterator=batches, valid_set=valid_set, optimiser=train_step,
-                           metric=accuracy, loss=loss, drop_out=ensemble_hyperparams[loop]['drop_out'])
+                           metric=accuracy, loss=loss, drop_out=default['drop_out'])
 
             if not os.path.exists(MODEL_PATH):
                 os.makedirs(MODEL_PATH)
