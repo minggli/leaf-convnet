@@ -53,9 +53,9 @@ default = {
         'dense_conn_1': [[2 * 2 * 64, 1024], [1024], [-1, 2 * 2 * 64]],
         'read_out': [[1024, n], [n]],
         'alpha': 5e-5,
-        'test_size': .15,
+        'test_size': .20,
         'batch_size': 200,
-        'num_epochs': 7000,
+        'num_epochs': 5000,
         'drop_out': [.5, .5]
     }
 
