@@ -19,7 +19,7 @@ MODEL_PATH = 'models/'
 IMAGE_PATH = 'leaf/images/'
 INPUT_PATH = 'leaf/'
 
-num_ensemble = 5
+num_ensemble = 10
 train, label, data = extract(INPUT_PATH + 'train.csv', target='species')
 
 print(sys.argv[1:])
@@ -44,7 +44,7 @@ default = {
         'alpha': 1e-3,
         'test_size': .1,
         'batch_size': 192,
-        'num_epochs': 500,
+        'num_epochs': 1000,
         'drop_out': .3
     }
 
