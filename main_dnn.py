@@ -42,9 +42,9 @@ default = {
         'hidden_layer_2': [[1024, 512], [512]],
         'read_out': [[512, n], [n]],
         'alpha': 1e-3,
-        'test_size': .20,
+        'test_size': .1,
         'batch_size': 192,
-        'num_epochs': 124,
+        'num_epochs': 300,
         'drop_out': .3
     }
 

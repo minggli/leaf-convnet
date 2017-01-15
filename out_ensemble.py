@@ -68,7 +68,7 @@ val_prob.append(np.array(cnn_result))
 # pred = clf.predict_proba(test_regressors)
 # val_prob.append(pred)
 
-output = np.mean(val_prob, axis=0)
+output = np.around(np.mean(val_prob, axis=0), decimals=1)
 print(output)
 
 
