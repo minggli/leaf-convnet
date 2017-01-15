@@ -44,7 +44,7 @@ default = {
         'alpha': 1e-3,
         'test_size': .1,
         'batch_size': 192,
-        'num_epochs': 300,
+        'num_epochs': 500,
         'drop_out': .3
     }
 
