@@ -3,9 +3,9 @@ import pandas as pd
 from utilities import delete_folders, extract, pic_resize, batch_iter, transform, move_classified, generate_training_set
 
 
-data = pd.read_csv('0.01371.csv', encoding='utf-8', index_col='id')
+data_raw = pd.read_csv('0.01371.csv', encoding='utf-8', index_col='id')
 
-data_raw = data.applymap(lambda x: np.around(x, decimals=1))
+# data_raw = data_raw.applymap(lambda x: np.around(x, decimals=1))
 
 
 def submit(raw):
