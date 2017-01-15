@@ -41,10 +41,10 @@ default = {
         'hidden_layer_1': [[192, 1024], [1024]],
         'hidden_layer_2': [[1024, 512], [512]],
         'read_out': [[512, n], [n]],
-        'alpha': 5e-5,
+        'alpha': 1e-3,
         'test_size': .20,
-        'batch_size': 200,
-        'num_epochs': 5000,
+        'batch_size': 192,
+        'num_epochs': 124,
         'drop_out': .3
     }
 
@@ -54,10 +54,10 @@ ensemble_hyperparams = {
         'hidden_layer_1': [[192, 1024], [1024]],
         'hidden_layer_2': [[1024, 512], [512]],
         'read_out': [[512, n], [n]],
-        'alpha': 5e-5,
+        'alpha': 1e-4,
         'test_size': .20,
-        'batch_size': 200,
-        'num_epochs': 5000,
+        'batch_size': 192,
+        'num_epochs': 2000,
         'drop_out': .3
     },
     1: {
@@ -150,7 +150,6 @@ def graph(hyperparams):
         h_hidden2 = tf.nn.sigmoid(tf.matmul(h_fc1_drop, W_hidden2) + b_hidden2)
 
     with tf.name_scope('drop_out_2'):
-        keep_prob = tf.placeholder(tf.float32)
         h_fc2_drop = tf.nn.dropout(h_hidden2, keep_prob)
 
     with tf.name_scope('read_out'):
@@ -162,7 +161,8 @@ def graph(hyperparams):
     # train
     cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits, y_)
     loss = tf.reduce_mean(cross_entropy)
-    train_step = tf.train.AdamOptimizer(learning_rate=hyperparams['alpha'], beta1=.9, beta2=.99).minimize(loss)
+    # train_step = tf.train.AdamOptimizer(learning_rate=hyperparams['alpha'], beta1=.9, beta2=.99).minimize(loss)
+    train_step = tf.train.RMSPropOptimizer(learning_rate=hyperparams['alpha']).minimize(loss)
 
     # eval
     correct_prediction = tf.equal(tf.argmax(logits, 1), tf.argmax(y_, 1))
@@ -177,8 +177,8 @@ def optimise(train_iterator, valid_set, optimiser, metric, loss, drop_out=.3):
 
     print('\n\n\n\nstarting neural network #{}... \n'. format(loop))
 
-    for i in sorted(ensemble_hyperparams[loop]):
-        print('{0}:{1}'.format(i, ensemble_hyperparams[loop][i]), end='\n', flush=False)
+    for i in sorted(default):
+        print('{0}:{1}'.format(i, default[i]), end='\n', flush=False)
     print('\n', flush=True)
 
     valid_x, valid_y = zip(*valid_set)
@@ -247,7 +247,7 @@ if __name__ == '__main__':
 
             with g.as_default():
 
-                graph(ensemble_hyperparams[loop])
+                graph(default)
 
                 prob, val_accuracy, val_prob = evaluate(test=test_data, metric=accuracy, valid_set=valid_set)
                 probs.append(prob)
@@ -269,20 +269,20 @@ if __name__ == '__main__':
         for loop in range(ENSEMBLE):
 
             train_set, valid_set = \
-                generate_training_set(data=train_data, test_size=ensemble_hyperparams[loop]['test_size'])
+                generate_training_set(data=train_data, test_size=default['test_size'])
 
-            batches = batch_iter(data=train_set, batch_size=ensemble_hyperparams[loop]['batch_size'],
-                                 num_epochs=ensemble_hyperparams[loop]['num_epochs'], shuffle=True)
+            batches = batch_iter(data=train_set, batch_size=default['batch_size'],
+                                 num_epochs=default['num_epochs'], shuffle=True)
 
             g = tf.Graph()
 
             with g.as_default():
-                graph(ensemble_hyperparams[loop])
+                graph(default)
 
                 with sess.as_default():
                     sess.run(initializer)
                     optimise(train_iterator=batches, valid_set=valid_set, optimiser=train_step,
-                           metric=accuracy, loss=loss, drop_out=ensemble_hyperparams[loop]['drop_out'])
+                           metric=accuracy, loss=loss, drop_out=default['drop_out'])
 
             if not os.path.exists(MODEL_PATH):
                 os.makedirs(MODEL_PATH)

@@ -58,11 +58,11 @@ def transform(data, label, dim, input_shape, pixels=None, normalize=True):
     elif dim == 1 and pixels is None:
         if label is not None:
             transformed = \
-                [(np.concatenate((margins.ix[i, :], shapes.ix[i, :], textures.ix[i, :]), axis=0).reshape(dim, input_shape),
+                [(np.concatenate((margins.ix[i, :], shapes.ix[i, :], textures.ix[i, :]), axis=0).reshape(input_shape),
                   label.ix[i, :]) for i in data.index]
         if label is None:
             transformed = \
-                [np.concatenate((margins.ix[i, :], shapes.ix[i, :], textures.ix[i, :]), axis=0).reshape(dim, input_shape) for i in data.index]
+                [np.concatenate((margins.ix[i, :], shapes.ix[i, :], textures.ix[i, :]), axis=0).reshape(input_shape) for i in data.index]
 
     return np.array(transformed)
 
