@@ -1,4 +1,5 @@
 from utilities import delete_folders, extract, pic_resize, batch_iter, transform, move_classified, generate_training_set
+from params import default, ensemble_hyperparams
 import pandas as pd
 import functools
 import operator
@@ -19,7 +20,7 @@ MODEL_PATH = 'models/'
 IMAGE_PATH = 'leaf/images/'
 INPUT_PATH = 'leaf/'
 
-num_ensemble = 10
+num_ensemble = 5
 train, label, data = extract(INPUT_PATH + 'train.csv', target='species')
 
 print(sys.argv[1:])
@@ -36,71 +37,6 @@ n = len(set(label))
 train_data = transform(data=train, label=label, dim=d, input_shape=m, pixels=None, normalize=True)
 
 # construct Deep Neural Network
-
-default = {
-        'hidden_layer_1': [[192, 1024], [1024]],
-        'hidden_layer_2': [[1024, 512], [512]],
-        'read_out': [[512, n], [n]],
-        'alpha': 1e-3,
-        'test_size': .1,
-        'batch_size': 192,
-        'num_epochs': 1000,
-        'drop_out': .3
-    }
-
-ensemble_hyperparams = {
-
-    0: {
-        'hidden_layer_1': [[192, 1024], [1024]],
-        'hidden_layer_2': [[1024, 512], [512]],
-        'read_out': [[512, n], [n]],
-        'alpha': 1e-4,
-        'test_size': .20,
-        'batch_size': 192,
-        'num_epochs': 2000,
-        'drop_out': .3
-    },
-    1: {
-        'hidden_layer_1': [[192, 1024], [1024]],
-        'hidden_layer_2': [[1024, 512], [512]],
-        'read_out': [[512, n], [n]],
-        'alpha': 5e-5,
-        'test_size': .20,
-        'batch_size': 200,
-        'num_epochs': 5000,
-        'drop_out': .3
-    },
-    2: {
-        'hidden_layer_1': [[192, 1024], [1024]],
-        'hidden_layer_2': [[1024, 512], [512]],
-        'read_out': [[512, n], [n]],
-        'alpha': 5e-5,
-        'test_size': .20,
-        'batch_size': 200,
-        'num_epochs': 5000,
-        'drop_out': .3
-    },
-    3: {
-        'hidden_layer_1': [[192, 1024], [1024]],
-        'hidden_layer_2': [[1024, 512], [512]],
-        'read_out': [[512, n], [n]],
-        'alpha': 5e-5,
-        'test_size': .20,
-        'batch_size': 200,
-        'num_epochs': 5000,
-        'drop_out': .3
-    },
-    4: {
-        'hidden_layer_1': [[192, 1024], [1024]],
-        'hidden_layer_2': [[1024, 512], [512]],
-        'read_out': [[512, n], [n]],
-        'alpha': 5e-5,
-        'test_size': .20,
-        'batch_size': 200,
-        'num_epochs': 5000,
-        'drop_out': .3
-    }
-}
 
 
 def weight_variable(shape):
@@ -161,8 +97,8 @@ def graph(hyperparams):
     # train
     cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits, y_)
     loss = tf.reduce_mean(cross_entropy)
-    # train_step = tf.train.AdamOptimizer(learning_rate=hyperparams['alpha'], beta1=.9, beta2=.99).minimize(loss)
-    train_step = tf.train.RMSPropOptimizer(learning_rate=hyperparams['alpha']).minimize(loss)
+    train_step = tf.train.AdamOptimizer(learning_rate=hyperparams['alpha'], beta1=.9, beta2=.99).minimize(loss)
+    # train_step = tf.train.RMSPropOptimizer(learning_rate=hyperparams['alpha']).minimize(loss)
 
     # eval
     correct_prediction = tf.equal(tf.argmax(logits, 1), tf.argmax(y_, 1))
@@ -177,8 +113,8 @@ def optimise(train_iterator, valid_set, optimiser, metric, loss, drop_out=.3):
 
     print('\n\n\n\nstarting neural network #{}... \n'. format(loop))
 
-    for i in sorted(default):
-        print('{0}:{1}'.format(i, default[i]), end='\n', flush=False)
+    for i in sorted(ensemble_hyperparams):
+        print('{0}:{1}'.format(i, ensemble_hyperparams[i]), end='\n', flush=False)
     print('\n', flush=True)
 
     valid_x, valid_y = zip(*valid_set)
@@ -247,7 +183,7 @@ if __name__ == '__main__':
 
             with g.as_default():
 
-                graph(default)
+                graph(ensemble_hyperparams[loop])
 
                 prob, val_accuracy, val_prob = evaluate(test=test_data, metric=accuracy, valid_set=valid_set)
                 probs.append(prob)
@@ -269,20 +205,20 @@ if __name__ == '__main__':
         for loop in range(ENSEMBLE):
 
             train_set, valid_set = \
-                generate_training_set(data=train_data, test_size=default['test_size'])
+                generate_training_set(data=train_data, test_size=ensemble_hyperparams[loop]['test_size'])
 
-            batches = batch_iter(data=train_set, batch_size=default['batch_size'],
-                                 num_epochs=default['num_epochs'], shuffle=True)
+            batches = batch_iter(data=train_set, batch_size=ensemble_hyperparams[loop]['batch_size'],
+                                 num_epochs=ensemble_hyperparams[loop]['num_epochs'], shuffle=True)
 
             g = tf.Graph()
 
             with g.as_default():
-                graph(default)
+                graph(ensemble_hyperparams[loop])
 
                 with sess.as_default():
                     sess.run(initializer)
                     optimise(train_iterator=batches, valid_set=valid_set, optimiser=train_step,
-                           metric=accuracy, loss=loss, drop_out=default['drop_out'])
+                           metric=accuracy, loss=loss, drop_out=ensemble_hyperparams[loop]['drop_out'])
 
             if not os.path.exists(MODEL_PATH):
                 os.makedirs(MODEL_PATH)
