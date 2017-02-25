@@ -1,5 +1,4 @@
 from utilities import delete_folders, extract, pic_resize, batch_iter, transform, move_classified, generate_training_set
-from params import default, ensemble_hyperparams
 import pandas as pd
 import functools
 import operator
@@ -37,6 +36,71 @@ n = len(set(label))
 train_data = transform(data=train, label=label, dim=d, input_shape=m, pixels=None, normalize=True)
 
 # construct Deep Neural Network
+
+default = {
+        'hidden_layer_1': [[192, 1024], [1024]],
+        'hidden_layer_2': [[1024, 512], [512]],
+        'read_out': [[512, n], [n]],
+        'alpha': 1e-3,
+        'test_size': .1,
+        'batch_size': 192,
+        'num_epochs': 1000,
+        'drop_out': .3
+    }
+
+ensemble_hyperparams = {
+
+    0: {
+        'hidden_layer_1': [[192, 1024], [1024]],
+        'hidden_layer_2': [[1024, 512], [512]],
+        'read_out': [[512, n], [n]],
+        'alpha': 1e-4,
+        'test_size': .20,
+        'batch_size': 250,
+        'num_epochs': 2000,
+        'drop_out': .3
+    },
+    1: {
+        'hidden_layer_1': [[192, 1024], [1024]],
+        'hidden_layer_2': [[1024, 512], [512]],
+        'read_out': [[512, n], [n]],
+        'alpha': 5e-5,
+        'test_size': .20,
+        'batch_size': 200,
+        'num_epochs': 5000,
+        'drop_out': .3
+    },
+    2: {
+        'hidden_layer_1': [[192, 1024], [1024]],
+        'hidden_layer_2': [[1024, 512], [512]],
+        'read_out': [[512, n], [n]],
+        'alpha': 1e-3,
+        'test_size': .10,
+        'batch_size': 200,
+        'num_epochs': 1500,
+        'drop_out': .3
+    },
+    3: {
+        'hidden_layer_1': [[192, 1024], [1024]],
+        'hidden_layer_2': [[1024, 512], [512]],
+        'read_out': [[512, n], [n]],
+        'alpha': 5e-5,
+        'test_size': .20,
+        'batch_size': 200,
+        'num_epochs': 5000,
+        'drop_out': .3
+    },
+    4: {
+        'hidden_layer_1': [[192, 1024], [1024]],
+        'hidden_layer_2': [[1024, 512], [512]],
+        'read_out': [[512, n], [n]],
+        'alpha': 1e-4,
+        'test_size': .15,
+        'batch_size': 192,
+        'num_epochs': 3000,
+        'drop_out': .3
+    }
+}
 
 
 def weight_variable(shape):
@@ -113,8 +177,8 @@ def optimise(train_iterator, valid_set, optimiser, metric, loss, drop_out=.3):
 
     print('\n\n\n\nstarting neural network #{}... \n'. format(loop))
 
-    for i in sorted(ensemble_hyperparams):
-        print('{0}:{1}'.format(i, ensemble_hyperparams[i]), end='\n', flush=False)
+    for i in sorted(ensemble_hyperparams[loop]):
+        print('{0}:{1}'.format(i, ensemble_hyperparams[loop][i]), end='\n', flush=False)
     print('\n', flush=True)
 
     valid_x, valid_y = zip(*valid_set)
