@@ -33,20 +33,21 @@ d = 1
 m = functools.reduce(operator.mul, input_shape, 1)
 n = len(set(label))
 
-train_data = transform(data=train, label=label, dim=d, input_shape=m, pixels=None, normalize=True)
+train_data = transform(data=train, label=label, dim=d,
+                       input_shape=m, pixels=None, normalize=True)
 
 # construct Deep Neural Network
 
 default = {
-        'hidden_layer_1': [[192, 1024], [1024]],
-        'hidden_layer_2': [[1024, 512], [512]],
-        'read_out': [[512, n], [n]],
-        'alpha': 1e-3,
-        'test_size': .1,
-        'batch_size': 192,
-        'num_epochs': 1000,
-        'drop_out': .3
-    }
+    'hidden_layer_1': [[192, 1024], [1024]],
+    'hidden_layer_2': [[1024, 512], [512]],
+    'read_out': [[512, n], [n]],
+    'alpha': 1e-3,
+    'test_size': .1,
+    'batch_size': 192,
+    'num_epochs': 1000,
+    'drop_out': .3
+}
 
 ensemble_hyperparams = {
 
@@ -55,7 +56,7 @@ ensemble_hyperparams = {
         'hidden_layer_2': [[1024, 512], [512]],
         'read_out': [[512, n], [n]],
         'alpha': 1e-4,
-        'test_size': .20,
+        'test_size': .10,
         'batch_size': 250,
         'num_epochs': 2000,
         'drop_out': .3
@@ -64,10 +65,10 @@ ensemble_hyperparams = {
         'hidden_layer_1': [[192, 1024], [1024]],
         'hidden_layer_2': [[1024, 512], [512]],
         'read_out': [[512, n], [n]],
-        'alpha': 5e-5,
-        'test_size': .20,
+        'alpha': 1e-4,
+        'test_size': .10,
         'batch_size': 200,
-        'num_epochs': 5000,
+        'num_epochs': 2000,
         'drop_out': .3
     },
     2: {
@@ -84,10 +85,10 @@ ensemble_hyperparams = {
         'hidden_layer_1': [[192, 1024], [1024]],
         'hidden_layer_2': [[1024, 512], [512]],
         'read_out': [[512, n], [n]],
-        'alpha': 5e-5,
-        'test_size': .20,
+        'alpha': 1e-4,
+        'test_size': .10,
         'batch_size': 200,
-        'num_epochs': 5000,
+        'num_epochs': 2000,
         'drop_out': .3
     },
     4: {
@@ -95,7 +96,7 @@ ensemble_hyperparams = {
         'hidden_layer_2': [[1024, 512], [512]],
         'read_out': [[512, n], [n]],
         'alpha': 1e-4,
-        'test_size': .15,
+        'test_size': .11,
         'batch_size': 192,
         'num_epochs': 3000,
         'drop_out': .3
@@ -161,7 +162,8 @@ def graph(hyperparams):
     # train
     cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits, y_)
     loss = tf.reduce_mean(cross_entropy)
-    train_step = tf.train.AdamOptimizer(learning_rate=hyperparams['alpha'], beta1=.9, beta2=.99).minimize(loss)
+    train_step = tf.train.AdamOptimizer(
+        learning_rate=hyperparams['alpha'], beta1=.9, beta2=.99).minimize(loss)
     # train_step = tf.train.RMSPropOptimizer(learning_rate=hyperparams['alpha']).minimize(loss)
 
     # eval
@@ -178,7 +180,8 @@ def optimise(train_iterator, valid_set, optimiser, metric, loss, drop_out=.3):
     print('\n\n\n\nstarting neural network #{}... \n'. format(loop))
 
     for i in sorted(ensemble_hyperparams[loop]):
-        print('{0}:{1}'.format(i, ensemble_hyperparams[loop][i]), end='\n', flush=False)
+        print('{0}:{1}'.format(i, ensemble_hyperparams[
+              loop][i]), end='\n', flush=False)
     print('\n', flush=True)
 
     valid_x, valid_y = zip(*valid_set)
@@ -194,7 +197,8 @@ def optimise(train_iterator, valid_set, optimiser, metric, loss, drop_out=.3):
 
         if i % 5 == 0:
             valid_accuracy, loss_score = \
-                sess.run([metric, loss], feed_dict={x: valid_x, y_: valid_y, keep_prob: 1.0})
+                sess.run([metric, loss], feed_dict={
+                         x: valid_x, y_: valid_y, keep_prob: 1.0})
             print("loop {4}, epoch {2}, step {0}, validation accuracy {1:.4f}, loss {3:.4f}".
                   format(i, valid_accuracy, epoch, loss_score, loop))
 
@@ -203,12 +207,16 @@ def evaluate(test, metric, valid_set):
 
     valid_x, valid_y = zip(*valid_set)
 
-    new_saver = tf.train.import_meta_graph(MODEL_PATH + 'model_ensemble_loop_{0}.ckpt.meta'.format(loop))
-    new_saver.restore(save_path=MODEL_PATH + 'model_ensemble_loop_{0}.ckpt'.format(loop), sess=sess)
+    new_saver = tf.train.import_meta_graph(
+        MODEL_PATH + 'model_ensemble_loop_{0}.ckpt.meta'.format(loop))
+    new_saver.restore(save_path=MODEL_PATH +
+                      'model_ensemble_loop_{0}.ckpt'.format(loop), sess=sess)
 
-    probability = sess.run(tf.nn.softmax(logits), feed_dict={x: test, keep_prob: 1.0})
+    probability = sess.run(tf.nn.softmax(logits), feed_dict={
+                           x: test, keep_prob: 1.0})
     valid_accuracy, valid_probability = \
-        sess.run([metric, tf.nn.softmax(logits)], feed_dict={x: valid_x, y_: valid_y, keep_prob: 1.0})
+        sess.run([metric, tf.nn.softmax(logits)], feed_dict={
+                 x: valid_x, y_: valid_y, keep_prob: 1.0})
 
     return probability, valid_accuracy, valid_probability
 
@@ -217,7 +225,8 @@ def submit(raw):
 
     delete_folders()
 
-    move_classified(test_data=raw, train_data=data, columns=label.columns, index=test.index, path=IMAGE_PATH)
+    move_classified(test_data=raw, train_data=data,
+                    columns=label.columns, index=test.index, path=IMAGE_PATH)
 
     df = pd.DataFrame(data=raw, columns=label.columns, index=test.index)
     df.to_csv('submission.csv', encoding='utf-8', header=True, index=True)
@@ -237,7 +246,8 @@ if __name__ == '__main__':
         val_probs = []
 
         _, _, test = extract(INPUT_PATH + 'test.csv')
-        test_data = transform(data=test, label=None, dim=d, input_shape=m, pixels=None, normalize=True)
+        test_data = transform(data=test, label=None, dim=d,
+                              input_shape=m, pixels=None, normalize=True)
 
         for loop in range(ENSEMBLE):
 
@@ -249,17 +259,21 @@ if __name__ == '__main__':
 
                 graph(ensemble_hyperparams[loop])
 
-                prob, val_accuracy, val_prob = evaluate(test=test_data, metric=accuracy, valid_set=valid_set)
+                prob, val_accuracy, val_prob = evaluate(
+                    test=test_data, metric=accuracy, valid_set=valid_set)
                 probs.append(prob)
                 val_accuracies.append(val_accuracy)
                 val_probs.append(val_prob)
 
-            print('Network: {0}, Validation Accuracy: {1:.4f}'.format(loop, val_accuracy))
+            print('Network: {0}, Validation Accuracy: {1:.4f}'.format(
+                loop, val_accuracy))
 
         ensemble_val_prob = np.mean(val_probs, axis=0)
-        ensemble_val_accuracy = sum(ensemble_val_prob.argmax(axis=1) == np.array(valid_y).argmax(axis=1)) / len(valid_y)
+        ensemble_val_accuracy = sum(ensemble_val_prob.argmax(
+            axis=1) == np.array(valid_y).argmax(axis=1)) / len(valid_y)
 
-        print('Ensemble Network of ({0}), Validation Accuracy: {1:.4f}'.format(loop + 1, ensemble_val_accuracy))
+        print('Ensemble Network of ({0}), Validation Accuracy: {1:.4f}'.format(
+            loop + 1, ensemble_val_accuracy))
 
         ensemble_prob = np.mean(probs, axis=0)
         submit(raw=ensemble_prob)
@@ -269,7 +283,8 @@ if __name__ == '__main__':
         for loop in range(ENSEMBLE):
 
             train_set, valid_set = \
-                generate_training_set(data=train_data, test_size=ensemble_hyperparams[loop]['test_size'])
+                generate_training_set(
+                    data=train_data, test_size=ensemble_hyperparams[loop]['test_size'])
 
             batches = batch_iter(data=train_set, batch_size=ensemble_hyperparams[loop]['batch_size'],
                                  num_epochs=ensemble_hyperparams[loop]['num_epochs'], shuffle=True)
@@ -282,11 +297,11 @@ if __name__ == '__main__':
                 with sess.as_default():
                     sess.run(initializer)
                     optimise(train_iterator=batches, valid_set=valid_set, optimiser=train_step,
-                           metric=accuracy, loss=loss, drop_out=ensemble_hyperparams[loop]['drop_out'])
+                             metric=accuracy, loss=loss, drop_out=ensemble_hyperparams[loop]['drop_out'])
 
             if not os.path.exists(MODEL_PATH):
                 os.makedirs(MODEL_PATH)
 
-            save_path = saver.save(sess, MODEL_PATH + "model_ensemble_loop_{0}.ckpt".format(loop))
+            save_path = saver.save(
+                sess, MODEL_PATH + "model_ensemble_loop_{0}.ckpt".format(loop))
             print("Model saved in file: {0}".format(save_path))
-
