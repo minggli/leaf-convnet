@@ -75,10 +75,10 @@ ensemble_hyperparams = {
         'hidden_layer_1': [[192, 1024], [1024]],
         'hidden_layer_2': [[1024, 512], [512]],
         'read_out': [[512, n], [n]],
-        'alpha': 1e-3,
+        'alpha': 1e-4,
         'test_size': .10,
         'batch_size': 200,
-        'num_epochs': 1500,
+        'num_epochs': 2000,
         'drop_out': .3
     },
     3: {
@@ -96,7 +96,7 @@ ensemble_hyperparams = {
         'hidden_layer_2': [[1024, 512], [512]],
         'read_out': [[512, n], [n]],
         'alpha': 1e-4,
-        'test_size': .11,
+        'test_size': .10,
         'batch_size': 192,
         'num_epochs': 3000,
         'drop_out': .3
