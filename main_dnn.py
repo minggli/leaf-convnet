@@ -19,7 +19,7 @@ MODEL_PATH = 'models/'
 IMAGE_PATH = 'leaf/images/'
 INPUT_PATH = 'leaf/'
 
-num_ensemble = 5
+num_ensemble = 10
 train, label, data = extract(INPUT_PATH + 'train.csv', target='species')
 
 print(sys.argv[1:])
@@ -39,15 +39,15 @@ train_data = transform(data=train, label=label, dim=d,
 # construct Deep Neural Network
 
 default = {
-    'hidden_layer_1': [[192, 2048], [2048]],
-        'hidden_layer_2': [[2048, 1024], [1024]],
-        'read_out': [[1024, n], [n]],
+        'hidden_layer_1': [[192, 1024], [1024]],
+        'hidden_layer_2': [[1024, 512], [512]],
+        'read_out': [[512, n], [n]],
         'alpha': 1e-3,
         'test_size': .10,
         'batch_size': 192,
         'num_epochs': 1000,
         'drop_out': .3
-}
+    }
 
 ensemble_hyperparams = {
 
