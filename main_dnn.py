@@ -57,50 +57,50 @@ ensemble_hyperparams = {
         'read_out': [[512, n], [n]],
         'alpha': 1e-3,
         'test_size': .10,
-        'batch_size': 250,
-        'num_epochs': 2000,
+        'batch_size': 192,
+        'num_epochs': 1000,
         'drop_out': .3
     },
     1: {
-        'hidden_layer_1': [[192, 1024], [1024]],
-        'hidden_layer_2': [[1024, 512], [512]],
-        'read_out': [[512, n], [n]],
+        'hidden_layer_1': [[192, 2048], [2048]],
+        'hidden_layer_2': [[2048, 1024], [1024]],
+        'read_out': [[1024, n], [n]],
         'alpha': 1e-3,
         'test_size': .10,
-        'batch_size': 200,
-        'num_epochs': 2000,
+        'batch_size': 192,
+        'num_epochs': 1000,
         'drop_out': .3
     },
     2: {
-        'hidden_layer_1': [[192, 1024], [1024]],
-        'hidden_layer_2': [[1024, 512], [512]],
-        'read_out': [[512, n], [n]],
+        'hidden_layer_1': [[192, 4096], [4096]],
+        'hidden_layer_2': [[4096, 2048], [2048]],
+        'read_out': [[2048, n], [n]],
         'alpha': 1e-3,
         'test_size': .10,
-        'batch_size': 200,
-        'num_epochs': 2000,
+        'batch_size': 192,
+        'num_epochs': 1000,
         'drop_out': .3
     },
     3: {
-        'hidden_layer_1': [[192, 1024], [1024]],
-        'hidden_layer_2': [[1024, 512], [512]],
-        'read_out': [[512, n], [n]],
+        'hidden_layer_1': [[192, 4096], [4096]],
+        'hidden_layer_2': [[4096, 2048], [2048]],
+        'read_out': [[2048, n], [n]],
         'alpha': 1e-3,
         'test_size': .10,
-        'batch_size': 200,
+        'batch_size': 192,
         'num_epochs': 2000,
         'drop_out': .3
     },
     4: {
-        'hidden_layer_1': [[192, 1024], [1024]],
-        'hidden_layer_2': [[1024, 512], [512]],
-        'read_out': [[512, n], [n]],
+        'hidden_layer_1': [[192, 2048], [2048]],
+        'hidden_layer_2': [[2048, 1024], [1024]],
+        'read_out': [[1024, n], [n]],
         'alpha': 1e-3,
         'test_size': .10,
         'batch_size': 192,
-        'num_epochs': 3000,
+        'num_epochs': 2000,
         'drop_out': .3
-    }
+    },
 }
 
 
